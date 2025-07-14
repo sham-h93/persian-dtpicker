@@ -1,9 +1,7 @@
 *.iml
-app
 .kotlin
 .gradle
 .idea
-settings.gradle.kts
 /local.properties
 /.idea/caches
 /.idea/libraries
