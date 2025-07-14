@@ -20,4 +20,5 @@ dependencyResolutionManagement {
 }
 
 rootProject.name = "persian-dtpicker"
+include(":sample")
 include(":lib")
