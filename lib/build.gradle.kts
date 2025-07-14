@@ -43,3 +43,17 @@ dependencies {
     implementation(libs.androidx.ui)
     implementation(libs.jalali.calendar)
 }
+
+publishing {
+    publications {
+        register<MavenPublication>("release") {
+            groupId = libGroupId
+            artifactId = libArtifactId
+            version = libVersion
+
+            afterEvaluate {
+                from(components["release"])
+            }
+        }
+    }
+}
