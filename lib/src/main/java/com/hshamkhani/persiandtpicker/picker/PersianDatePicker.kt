@@ -2,13 +2,13 @@ package com.hshamkhani.persiandtpicker.picker
 
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Row
+import androidx.compose.foundation.layout.Spacer
+import androidx.compose.foundation.layout.width
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.CompositionLocalProvider
 import androidx.compose.runtime.LaunchedEffect
-import androidx.compose.runtime.derivedStateOf
 import androidx.compose.runtime.getValue
-import androidx.compose.runtime.mutableIntStateOf
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
 import androidx.compose.runtime.setValue
@@ -24,36 +24,60 @@ import androidx.compose.ui.unit.dp
 import com.hshamkhani.persiandtpicker.components.WheelPicker
 import com.hshamkhani.persiandtpicker.utils.DateUtils
 import com.hshamkhani.persiandtpicker.utils.PersianNumberUtils.formatToHindiIfLanguageIsFa
-import com.hshamkhani.persiandtpicker.utils.PersianNumberUtils.toArabicDigits
-import ir.huri.jcal.JalaliCalendar
+import com.hshamkhani.persiandtpicker.utils.SimpleDate
+
+/**
+ * A composable function that displays a Persian date picker with options
+ * for selecting the day, month, and year.
+ *
+ * @param modifier The modifier to be applied to the time picker.
+ * @param textStyle The text style for the time picker options.
+ * @param textColor The color of the text for the time picker options.
+ * @param selectedTextColor The color of the text for the selected time picker option.
+ * @param backGroundColor The background color of the time picker.
+ * @param selectedItemBackgroundColor The background color of the selected item in the time picker.
+ * @param fontFamily The font family to be used for the text in the time picker.
+ * @param onDateSelected A callback function that is invoked when the selected time changes,
+ * it receives a `SimpleDate` object representing the selected time.
+ * */
 
 @Composable
 fun PersianDatePicker(
     modifier: Modifier = Modifier,
+    withTimePicker: Boolean = false,
     textStyle: TextStyle = MaterialTheme.typography.headlineMedium,
     fontFamily: FontFamily = FontFamily.Default,
     textColor: Color = MaterialTheme.colorScheme.onSurface,
     selectedTextColor: Color = MaterialTheme.colorScheme.primary,
     backGroundColor: Color = MaterialTheme.colorScheme.background,
     selectedItemBackgroundColor: Color = MaterialTheme.colorScheme.surfaceContainerLowest,
-    selectedItemBackgroundClipSize: Dp = 16.dp,
-    isEnglish: Boolean? = null,
-    onDateSelected: (jYear: Int, jMonth: Int, jDay: Int) -> Unit,
+    onDateSelected: (date: SimpleDate) -> Unit,
 ) {
 
-    val isEng = isEnglish ?: (Locale.current.language != "fa")
+    val isEng = Locale.current.language != "fa"
 
     val initialDate by remember {
-        mutableStateOf(JalaliCalendar())
+        mutableStateOf(DateUtils.currentJalaliDate())
     }
 
-    var selectedDate by remember {
-        mutableStateOf(initialDate)
+    var simpleDate by remember(initialDate) {
+        mutableStateOf(
+            SimpleDate(
+                year = initialDate.component1(),
+                month = initialDate.component2(),
+                day = initialDate.component3()
+            )
+        )
+    }
+
+    LaunchedEffect(simpleDate) {
+        onDateSelected(simpleDate)
     }
 
     val years by remember {
         mutableStateOf(
-            DateUtils.initYearList(initialDate.year).map { it.toString().formatToHindiIfLanguageIsFa() })
+            DateUtils.initYearList(initialDate.component1())
+                .map { it.toString().formatToHindiIfLanguageIsFa() })
     }
 
     val months by remember {
@@ -62,84 +86,81 @@ fun PersianDatePicker(
         )
     }
 
-    val days by remember(selectedDate.month) {
-        if (selectedDate.monthLength == 30 && selectedDate.day == 31) {
-            selectedDate.day -= 1
-        }
+    val days by remember(simpleDate.month) {
+        val monthLength =
+            DateUtils.monthLength(simpleDate.month, simpleDate.year).size
         mutableStateOf(
-            DateUtils.initDaysList(selectedDate.monthLength).map { it }
+            DateUtils.initDaysList(monthLength).map { it }
         )
     }
 
-    LaunchedEffect(selectedDate) {
-        onDateSelected(
-            selectedDate.year,
-            selectedDate.month,
-            selectedDate.day,
-        )
-    }
-
-    CompositionLocalProvider(LocalLayoutDirection provides LayoutDirection.Rtl) {
+    CompositionLocalProvider(LocalLayoutDirection provides LayoutDirection.Rtl) {}
         Row(
             modifier = modifier,
-            horizontalArrangement = Arrangement.spacedBy(8.dp)
+            horizontalArrangement = Arrangement.spacedBy(4.dp)
         ) {
+            if (withTimePicker) {
+                TimePicker(
+                    modifier = Modifier,
+                    textStyle = textStyle,
+                    fontFamily = fontFamily,
+                    textColor = textColor,
+                    selectedTextColor = selectedTextColor,
+                    backGroundColor = backGroundColor,
+                    selectedItemBackgroundColor = selectedItemBackgroundColor,
+                ) { time ->
+                    simpleDate = simpleDate.copy(
+                        time = time
+                    )
+                }
+                Spacer(Modifier.width(8.dp))
+            }
 
             WheelPicker(
                 modifier = Modifier,
                 options = days,
-                initialValue = initialDate.day - 1,
+                initialValueIndex = initialDate.component3() - 1, // day
                 fontFamily = fontFamily,
                 textStyle = textStyle,
                 textColor = textColor,
                 selectedTextColor = selectedTextColor,
                 backGroundColor = backGroundColor,
                 selectedItemBackgroundColor = selectedItemBackgroundColor,
-                selectedItemBackgroundClipSize = selectedItemBackgroundClipSize,
-                onValueSelected = { index, _ ->
-                    selectedDate = JalaliCalendar().apply {
-                        day = index + 1
-                        month = selectedDate.month
-                        year = selectedDate.year
-                    }
+                onValueSelected = { index, value ->
+                    simpleDate = simpleDate.copy(
+                        day = value.toInt(),
+                    )
                 }
             )
             WheelPicker(
                 options = months,
-                initialValue = initialDate.month - 1,
+                initialValueIndex = initialDate.component2() - 1, // month
                 fontFamily = fontFamily,
                 textStyle = textStyle,
                 textColor = textColor,
                 selectedTextColor = selectedTextColor,
                 backGroundColor = backGroundColor,
                 selectedItemBackgroundColor = selectedItemBackgroundColor,
-                selectedItemBackgroundClipSize = selectedItemBackgroundClipSize,
                 onValueSelected = { index, _ ->
-                    selectedDate = JalaliCalendar().apply {
-                        day = selectedDate.day
-                        month = index + 1
-                        year = selectedDate.year
-                    }
+                    simpleDate = simpleDate.copy(
+                        month = index + 1 // month is 1-based,
+                    )
                 }
             )
             WheelPicker(
                 options = years,
-                initialValue = 1,
                 fontFamily = fontFamily,
                 textStyle = textStyle,
                 textColor = textColor,
                 selectedTextColor = selectedTextColor,
                 backGroundColor = backGroundColor,
                 selectedItemBackgroundColor = selectedItemBackgroundColor,
-                selectedItemBackgroundClipSize = selectedItemBackgroundClipSize,
-                onValueSelected = { index, _ ->
-                    selectedDate = JalaliCalendar().apply {
-                        day = selectedDate.day
-                        month = selectedDate.month
-                        year = years[index].toArabicDigits()
-                    }
+                onValueSelected = { index, value ->
+                    simpleDate = simpleDate.copy(
+                        year = value.toInt()
+                    )
                 }
             )
         }
-    }
+
 }

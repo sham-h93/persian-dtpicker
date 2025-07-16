@@ -39,23 +39,22 @@ import androidx.compose.ui.unit.dp
 internal fun WheelPicker(
     modifier: Modifier = Modifier,
     options: List<String>,
-    initialValue: Int = 0,
+    initialValueIndex: Int = 0,
     textStyle: TextStyle = MaterialTheme.typography.headlineMedium,
     textColor: Color = MaterialTheme.colorScheme.onSurface,
     selectedTextColor: Color = MaterialTheme.colorScheme.primary,
     backGroundColor: Color = MaterialTheme.colorScheme.background,
     selectedItemBackgroundColor: Color = MaterialTheme.colorScheme.surfaceContainerLowest,
-    selectedItemBackgroundClipSize: Dp = 16.dp,
     fontFamily: FontFamily = FontFamily.Default,
     onValueSelected: (index: Int, value: String) -> Unit,
 ) {
 
 
-    var selectedIndex by remember { mutableIntStateOf(initialValue) }
+    var selectedIndex by remember { mutableIntStateOf(initialValueIndex) }
     val denisty = LocalDensity.current
     val itemSize = with(denisty) { (textStyle.fontSize * 2).toDp() }
     val lazyListState = rememberLazyListState(
-        initialFirstVisibleItemIndex = initialValue
+        initialFirstVisibleItemIndex = initialValueIndex
     )
 
     LaunchedEffect(lazyListState) {
@@ -87,7 +86,7 @@ internal fun WheelPicker(
                     modifier = Modifier
                         .height(itemSize)
                         .wrapContentSize(align = Alignment.Center)
-                        .clip(RoundedCornerShape(selectedItemBackgroundClipSize))
+                        .clip(RoundedCornerShape(itemSize / 4))
                         .background(
                             if (item == selectedIndex) {
                                 selectedItemBackgroundColor
@@ -95,9 +94,7 @@ internal fun WheelPicker(
                                 backGroundColor
                             }
                         )
-                        .defaultMinSize(minWidth = itemSize)
-                        .clickable { selectedIndex = item }
-                        .padding(8.dp),
+                        .padding(itemSize / 10),
                     text = options[item],
                     style = textStyle,
                     textAlign = TextAlign.Center,

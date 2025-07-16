@@ -14,7 +14,7 @@ android {
     compileSdk = 36
 
     defaultConfig {
-        minSdk = 24
+        minSdk = 26
 
         testInstrumentationRunner = "androidx.test.runner.AndroidJUnitRunner"
         consumerProguardFiles("consumer-rules.pro")
@@ -42,6 +42,7 @@ dependencies {
     implementation(libs.androidx.material3)
     implementation(libs.androidx.ui)
     implementation(libs.jalali.calendar)
+    implementation(libs.kotlinx.datetime)
 }
 
 publishing {

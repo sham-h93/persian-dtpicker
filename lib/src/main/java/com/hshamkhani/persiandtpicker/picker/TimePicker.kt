@@ -1,12 +1,13 @@
 package com.hshamkhani.persiandtpicker.picker
 
-import androidx.compose.foundation.layout.Arrangement
+import android.text.format.DateFormat
 import androidx.compose.foundation.layout.Row
+import androidx.compose.foundation.layout.Spacer
+import androidx.compose.foundation.layout.width
 import androidx.compose.foundation.layout.wrapContentSize
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
-import androidx.compose.runtime.CompositionLocalProvider
 import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
@@ -15,16 +16,32 @@ import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
-import androidx.compose.ui.platform.LocalLayoutDirection
+import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.text.TextStyle
 import androidx.compose.ui.text.font.FontFamily
 import androidx.compose.ui.text.intl.Locale
-import androidx.compose.ui.unit.Dp
-import androidx.compose.ui.unit.LayoutDirection
 import androidx.compose.ui.unit.dp
 import com.hshamkhani.persiandtpicker.components.WheelPicker
+import com.hshamkhani.persiandtpicker.utils.ClockPeriod
 import com.hshamkhani.persiandtpicker.utils.DateUtils
-import java.util.Calendar
+import com.hshamkhani.persiandtpicker.utils.SimpleTime
+import java.time.LocalTime
+
+
+/**
+ * A composable function that displays a time picker with options for hours, minutes, and AM/PM (if not in 24-hour format).
+ *
+ * @param modifier The modifier to be applied to the time picker.
+ * @param textStyle The text style for the time picker options.
+ * @param textColor The color of the text for the time picker options.
+ * @param selectedTextColor The color of the text for the selected time picker option.
+ * @param backGroundColor The background color of the time picker.
+ * @param selectedItemBackgroundColor The background color of the selected item in the time picker.
+ * @param fontFamily The font family to be used for the text in the time picker.
+ * @param onTimeChanged A callback function that is invoked when the selected time changes,
+ * it receives a `SimpleTime` object representing the selected time.
+ *
+ **/
 
 @Composable
 fun TimePicker(
@@ -34,32 +51,44 @@ fun TimePicker(
     selectedTextColor: Color = MaterialTheme.colorScheme.primary,
     backGroundColor: Color = MaterialTheme.colorScheme.background,
     selectedItemBackgroundColor: Color = MaterialTheme.colorScheme.surfaceContainerLowest,
-    selectedItemBackgroundClipSize: Dp = 16.dp,
     fontFamily: FontFamily = FontFamily.Default,
-    is24h: Boolean = false,
-    onTimeChanged: (hour: Int, minutes: Int, amPm: Int?) -> Unit,
+    onTimeChanged: (SimpleTime) -> Unit,
 ) {
 
+    val context = LocalContext.current
     val locale = Locale.current
-    val calendar by remember {
+
+    val now by remember {
         mutableStateOf(
-            Calendar.getInstance(locale.platformLocale)
+            LocalTime.now()
         )
     }
 
+    val is24Hour = DateFormat.is24HourFormat(context)
+
     var selectedTime by remember {
-        mutableStateOf(calendar)
+        mutableStateOf(now)
     }
 
-    val hoursType = if (is24h) Calendar.HOUR_OF_DAY else Calendar.HOUR
-    val isDST = calendar.timeZone.inDaylightTime(calendar.time)
-    val calInitHours = calendar.get(hoursType).also { hours ->
-        if (isDST) hours - 1 else hours
-    }
-
-    val hours by remember(is24h) {
+    var simpleTime by remember(selectedTime) {
         mutableStateOf(
-            DateUtils.initHours(is24h)
+            SimpleTime(
+                hour = now.hour,
+                minute = now.minute,
+                clockPeriod = if (is24Hour) null else {
+                    if (now.hour < 12) {
+                        ClockPeriod.Am
+                    } else {
+                        ClockPeriod.Pm
+                    }
+                }
+            )
+        )
+    }
+
+    val hours by remember {
+        mutableStateOf(
+            DateUtils.initHours(is24Hour)
         )
     }
 
@@ -75,94 +104,74 @@ fun TimePicker(
         )
     }
 
-    LaunchedEffect(selectedTime, is24h) {
-        onTimeChanged(
-            selectedTime.get(hoursType),
-            selectedTime.get(Calendar.MINUTE),
-            if (!is24h) selectedTime.get(Calendar.AM_PM) else null
-        )
+    LaunchedEffect(simpleTime) {
+        onTimeChanged(simpleTime)
     }
+    Row(
+        modifier = modifier.wrapContentSize(),
+        verticalAlignment = Alignment.CenterVertically
+    ) {
+        WheelPicker(
+            modifier = Modifier,
+            options = minutes,
+            initialValueIndex = now.minute,
+            fontFamily = fontFamily,
+            textStyle = textStyle,
+            textColor = textColor,
+            selectedTextColor = selectedTextColor,
+            backGroundColor = backGroundColor,
+            selectedItemBackgroundColor = selectedItemBackgroundColor,
+            onValueSelected = { insex, _ ->
+                simpleTime = simpleTime.copy(
+                    minute = insex
+                )
+            }
+        )
 
-    CompositionLocalProvider(LocalLayoutDirection provides LayoutDirection.Ltr) {
-        Row(
-            modifier = modifier.wrapContentSize(),
-            horizontalArrangement = Arrangement.spacedBy(8.dp),
-            verticalAlignment = Alignment.CenterVertically
-        ) {
-            WheelPicker(
-                modifier = Modifier,
-                options = hours,
-                initialValue = if (is24h) {
-                    calInitHours
-                } else {
-                    if (calInitHours == 0) {
-                        11
-                    } else {
-                        calInitHours
-                    }
-                },
-                fontFamily = fontFamily,
-                textStyle = textStyle,
-                textColor = textColor,
-                selectedTextColor = selectedTextColor,
-                backGroundColor = backGroundColor,
-                selectedItemBackgroundColor = selectedItemBackgroundColor,
-                selectedItemBackgroundClipSize = selectedItemBackgroundClipSize,
-                onValueSelected = { index, _ ->
-                    selectedTime = Calendar.getInstance().apply {
-                        val hour = if (is24h) index else index + 1
-                        set(hoursType, hour)
-                        set(Calendar.MINUTE, selectedTime.get(Calendar.MINUTE))
-                        if (!is24h) set(Calendar.AM_PM, selectedTime.get(Calendar.AM_PM))
-                    }
-                }
-            )
-            Text(
-                text = ":",
-                style = textStyle,
-                color = MaterialTheme.colorScheme.primary
-            )
-            WheelPicker(
-                modifier = Modifier,
-                options = minutes,
-                initialValue = calendar.get(Calendar.MINUTE),
-                fontFamily = fontFamily,
-                textStyle = textStyle,
-                textColor = textColor,
-                selectedTextColor = selectedTextColor,
-                backGroundColor = backGroundColor,
-                selectedItemBackgroundColor = selectedItemBackgroundColor,
-                selectedItemBackgroundClipSize = selectedItemBackgroundClipSize,
-                onValueSelected = { insex, _ ->
-                    selectedTime = Calendar.getInstance().apply {
-                        set(hoursType, selectedTime.get(hoursType))
-                        set(Calendar.MINUTE, insex)
-                        if (!is24h) set(Calendar.AM_PM, selectedTime.get(Calendar.AM_PM))
-                    }
-                }
-            )
-            if (!is24h) {
-                WheelPicker(
-                    modifier = Modifier,
-                    options = amPm.toList(),
-                    initialValue = calendar.get(Calendar.AM_PM),
-                    fontFamily = fontFamily,
-                    textStyle = textStyle,
-                    textColor = textColor,
-                    selectedTextColor = selectedTextColor,
-                    backGroundColor = backGroundColor,
-                    selectedItemBackgroundColor = selectedItemBackgroundColor,
-                    selectedItemBackgroundClipSize = selectedItemBackgroundClipSize,
-                    onValueSelected = { index, value ->
-                        selectedTime = Calendar.getInstance().apply {
-                            set(hoursType, selectedTime.get(hoursType))
-                            set(Calendar.MINUTE, selectedTime.get(Calendar.MINUTE))
-                            set(Calendar.AM_PM, index)
-                        }
+        Text(
+            text = ":",
+            style = textStyle,
+            color = MaterialTheme.colorScheme.primary
+        )
+
+        WheelPicker(
+            modifier = Modifier,
+            options = hours,
+            initialValueIndex = if (is24Hour) now.hour else if (now.hour == 0 || now.hour == 12) 11 else (now.hour % 12) - 1,
+            fontFamily = fontFamily,
+            textStyle = textStyle,
+            textColor = textColor,
+            selectedTextColor = selectedTextColor,
+            backGroundColor = backGroundColor,
+            selectedItemBackgroundColor = selectedItemBackgroundColor,
+            onValueSelected = { index, value ->
+                simpleTime = simpleTime.copy(
+                    hour = value.toInt(),
+                    clockPeriod = if (is24Hour) null else {
+                        if (value.toInt() < 12) ClockPeriod.Am else ClockPeriod.Pm
                     }
                 )
             }
-        }
+        )
 
+        if (!is24Hour) {
+            Spacer(Modifier.width(4.dp))
+            WheelPicker(
+                modifier = Modifier,
+                options = amPm.toList(),
+                initialValueIndex = if (simpleTime.clockPeriod == ClockPeriod.Am) 0 else 1,
+                fontFamily = fontFamily,
+                textStyle = textStyle,
+                textColor = textColor,
+                selectedTextColor = selectedTextColor,
+                backGroundColor = backGroundColor,
+                selectedItemBackgroundColor = selectedItemBackgroundColor,
+                onValueSelected = { index, _ ->
+                    simpleTime = simpleTime.copy(
+                        clockPeriod = if (index == 0) ClockPeriod.Am else ClockPeriod.Pm
+                    )
+                }
+            )
+        }
     }
 }
