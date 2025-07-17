@@ -1,7 +1,5 @@
 package com.hshamkhani.persiandtpicker.utils
 
-import java.time.LocalDate
-
 /**
  *  Represents a simple date (either gregorian or jalali)
  *  with year, month, day, and an optional time.
@@ -12,24 +10,6 @@ data class SimpleDate(
     val day: Int,
     val time: SimpleTime = SimpleTime()
 ) {
-    /**
-     * Returns the timestamp in seconds (for gregorian date) since epoch for this date and time.
-     */
-    fun toTimestampSeconds(): Long {
-        val localDate = LocalDate.of(year, month, day)
-        val epochSeconds = localDate.toEpochDay() * 86400
-
-        val hour = if (time.clockPeriod != null) {
-            if (time.clockPeriod == ClockPeriod.Pm) time.hour + 12 else time.hour
-        } else {
-            time.hour
-        }
-
-        val secondsOfDay = (hour * 3600L) + (time.minute * 60L)
-
-        return epochSeconds + secondsOfDay
-    }
-
     override fun toString(): String {
         return "${year}-${month}-${day}" +
                 " ${time.hour}:${time.minute} ${time.clockPeriod ?: ""}"

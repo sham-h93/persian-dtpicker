@@ -26,6 +26,7 @@ import com.hshamkhani.persiandtpicker.utils.ClockPeriod
 import com.hshamkhani.persiandtpicker.utils.DateUtils
 import com.hshamkhani.persiandtpicker.utils.SimpleTime
 import java.time.LocalTime
+import java.time.ZoneId
 
 
 /**
@@ -60,7 +61,7 @@ fun TimePicker(
 
     val now by remember {
         mutableStateOf(
-            LocalTime.now()
+            LocalTime.now(ZoneId.systemDefault() ?: ZoneId.of("UTC"))
         )
     }
 
