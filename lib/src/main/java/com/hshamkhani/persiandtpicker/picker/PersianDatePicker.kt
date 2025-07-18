@@ -14,15 +14,15 @@ import androidx.compose.runtime.remember
 import androidx.compose.runtime.setValue
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
+import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.platform.LocalLayoutDirection
 import androidx.compose.ui.text.TextStyle
 import androidx.compose.ui.text.font.FontFamily
 import androidx.compose.ui.text.intl.Locale
-import androidx.compose.ui.unit.Dp
 import androidx.compose.ui.unit.LayoutDirection
 import androidx.compose.ui.unit.dp
 import com.hshamkhani.persiandtpicker.components.WheelPicker
-import com.hshamkhani.persiandtpicker.utils.DateUtils
+import com.hshamkhani.persiandtpicker.utils.DatePickerUtils
 import com.hshamkhani.persiandtpicker.utils.PersianNumberUtils.formatToHindiIfLanguageIsFa
 import com.hshamkhani.persiandtpicker.utils.SimpleDate
 
@@ -55,20 +55,10 @@ fun PersianDatePicker(
 ) {
 
     val isEng = Locale.current.language != "fa"
+    val context = LocalContext.current
 
-    val initialDate by remember {
-        mutableStateOf(DateUtils.currentJalaliDate())
-    }
-
-    var simpleDate by remember(initialDate) {
-        mutableStateOf(
-            SimpleDate(
-                year = initialDate.component1(),
-                month = initialDate.component2(),
-                day = initialDate.component3()
-            )
-        )
-    }
+    val initialDate by remember { mutableStateOf(SimpleDate.now(context = context)) }
+    var simpleDate by remember { mutableStateOf(initialDate) }
 
     LaunchedEffect(simpleDate) {
         onDateSelected(simpleDate)
@@ -76,91 +66,89 @@ fun PersianDatePicker(
 
     val years by remember {
         mutableStateOf(
-            DateUtils.initYearList(initialDate.component1())
+            DatePickerUtils.initYearList(initialDate.year)
                 .map { it.toString().formatToHindiIfLanguageIsFa() })
     }
 
     val months by remember {
         mutableStateOf(
-            DateUtils.initMonthList(isEng = isEng)
+            DatePickerUtils.initMonthList(isEng = isEng)
         )
     }
 
     val days by remember(simpleDate.month) {
         val monthLength =
-            DateUtils.monthLength(simpleDate.month, simpleDate.year).size
+            DatePickerUtils.monthLength(simpleDate.month, simpleDate.year).size
         mutableStateOf(
-            DateUtils.initDaysList(monthLength).map { it }
+            DatePickerUtils.initDaysList(monthLength).map { it }
         )
     }
 
-    CompositionLocalProvider(LocalLayoutDirection provides LayoutDirection.Rtl) {}
-        Row(
-            modifier = modifier,
-            horizontalArrangement = Arrangement.spacedBy(4.dp)
-        ) {
-            if (withTimePicker) {
-                TimePicker(
-                    modifier = Modifier,
-                    textStyle = textStyle,
-                    fontFamily = fontFamily,
-                    textColor = textColor,
-                    selectedTextColor = selectedTextColor,
-                    backGroundColor = backGroundColor,
-                    selectedItemBackgroundColor = selectedItemBackgroundColor,
-                ) { time ->
-                    simpleDate = simpleDate.copy(
-                        time = time
-                    )
-                }
-                Spacer(Modifier.width(8.dp))
-            }
-
-            WheelPicker(
+    Row(
+        modifier = modifier,
+        horizontalArrangement = Arrangement.spacedBy(4.dp)
+    ) {
+        if (withTimePicker) {
+            TimePicker(
                 modifier = Modifier,
-                options = days,
-                initialValueIndex = initialDate.component3() - 1, // day
-                fontFamily = fontFamily,
                 textStyle = textStyle,
+                fontFamily = fontFamily,
                 textColor = textColor,
                 selectedTextColor = selectedTextColor,
                 backGroundColor = backGroundColor,
                 selectedItemBackgroundColor = selectedItemBackgroundColor,
-                onValueSelected = { index, value ->
-                    simpleDate = simpleDate.copy(
-                        day = value.toInt(),
-                    )
-                }
-            )
-            WheelPicker(
-                options = months,
-                initialValueIndex = initialDate.component2() - 1, // month
-                fontFamily = fontFamily,
-                textStyle = textStyle,
-                textColor = textColor,
-                selectedTextColor = selectedTextColor,
-                backGroundColor = backGroundColor,
-                selectedItemBackgroundColor = selectedItemBackgroundColor,
-                onValueSelected = { index, _ ->
-                    simpleDate = simpleDate.copy(
-                        month = index + 1 // month is 1-based,
-                    )
-                }
-            )
-            WheelPicker(
-                options = years,
-                fontFamily = fontFamily,
-                textStyle = textStyle,
-                textColor = textColor,
-                selectedTextColor = selectedTextColor,
-                backGroundColor = backGroundColor,
-                selectedItemBackgroundColor = selectedItemBackgroundColor,
-                onValueSelected = { index, value ->
-                    simpleDate = simpleDate.copy(
-                        year = value.toInt()
-                    )
-                }
-            )
+            ) { time ->
+                simpleDate = simpleDate.copy(
+                    time = time
+                )
+            }
+            Spacer(Modifier.width(8.dp))
         }
 
+        WheelPicker(
+            modifier = Modifier,
+            options = days,
+            initialValueIndex = initialDate.day - 1,
+            fontFamily = fontFamily,
+            textStyle = textStyle,
+            textColor = textColor,
+            selectedTextColor = selectedTextColor,
+            backGroundColor = backGroundColor,
+            selectedItemBackgroundColor = selectedItemBackgroundColor,
+            onValueSelected = { index, value ->
+                simpleDate = simpleDate.copy(
+                    day = value.toInt(),
+                )
+            }
+        )
+        WheelPicker(
+            options = months,
+            initialValueIndex = initialDate.month - 1,
+            fontFamily = fontFamily,
+            textStyle = textStyle,
+            textColor = textColor,
+            selectedTextColor = selectedTextColor,
+            backGroundColor = backGroundColor,
+            selectedItemBackgroundColor = selectedItemBackgroundColor,
+            onValueSelected = { index, _ ->
+                simpleDate = simpleDate.copy(
+                    month = index + 1 // month is 1-based,
+                )
+            }
+        )
+        WheelPicker(
+            options = years,
+            fontFamily = fontFamily,
+            textStyle = textStyle,
+            textColor = textColor,
+            selectedTextColor = selectedTextColor,
+            backGroundColor = backGroundColor,
+            selectedItemBackgroundColor = selectedItemBackgroundColor,
+            onValueSelected = { index, value ->
+                simpleDate = simpleDate.copy(
+                    year = value.toInt()
+                )
+            }
+        )
+    }
 }

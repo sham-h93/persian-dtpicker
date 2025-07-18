@@ -23,7 +23,7 @@ import androidx.compose.ui.text.intl.Locale
 import androidx.compose.ui.unit.dp
 import com.hshamkhani.persiandtpicker.components.WheelPicker
 import com.hshamkhani.persiandtpicker.utils.ClockPeriod
-import com.hshamkhani.persiandtpicker.utils.DateUtils
+import com.hshamkhani.persiandtpicker.utils.DatePickerUtils
 import com.hshamkhani.persiandtpicker.utils.SimpleTime
 import java.time.LocalTime
 import java.time.ZoneId
@@ -59,11 +59,7 @@ fun TimePicker(
     val context = LocalContext.current
     val locale = Locale.current
 
-    val now by remember {
-        mutableStateOf(
-            LocalTime.now(ZoneId.systemDefault() ?: ZoneId.of("UTC"))
-        )
-    }
+    val now by remember { mutableStateOf(DatePickerUtils.currentDate()) }
 
     val is24Hour = DateFormat.is24HourFormat(context)
 
@@ -89,19 +85,19 @@ fun TimePicker(
 
     val hours by remember {
         mutableStateOf(
-            DateUtils.initHours(is24Hour)
+            DatePickerUtils.initHours(is24Hour)
         )
     }
 
     val minutes by remember {
         mutableStateOf(
-            DateUtils.initMinutes()
+            DatePickerUtils.initMinutes()
         )
     }
 
     val amPm by remember {
         mutableStateOf(
-            DateUtils.initAmPm(locale.language != "fa")
+            DatePickerUtils.initAmPm(locale.language != "fa")
         )
     }
 

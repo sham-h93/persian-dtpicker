@@ -2,8 +2,10 @@ package com.hshamkhani.persiandtpicker.utils
 
 import com.hshamkhani.persiandtpicker.utils.PersianNumberUtils.padZeroToStartWithPersianDigits
 import java.time.LocalDate
+import java.time.LocalTime
+import java.time.ZoneId
 
-internal object DateUtils {
+internal object DatePickerUtils {
 
     fun initHours(is24h: Boolean): List<String> {
         val values = mutableListOf<String>()
@@ -91,6 +93,11 @@ internal object DateUtils {
             gd = now.dayOfMonth
         )
     }
+
+    /**
+     * Returns the current time in the system's default time zone.
+     * */
+    fun currentDate() = LocalTime.now(ZoneId.systemDefault() ?: ZoneId.of("UTC"))
 
     fun initMinutes(): List<String> {
         val values = mutableListOf<String>()

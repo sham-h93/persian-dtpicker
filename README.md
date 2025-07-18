@@ -1,5 +1,5 @@
 # Persian Date Picker
-![banner](https://github.com/sham-h93/persian-dtpicker/images/banner.png)
+![banner](https://github.com/sham-h93/persian-dtpicker/blob/master/images/banner.png)
 
 [![](https://jitpack.io/v/sham-h93/persian-dtpicker.svg)](https://jitpack.io/#sham-h93/persian-dtpicker) ![Android lib](https://img.shields.io/badge/Android-green) ![JetpackCompose](https://img.shields.io/badge/JetpackCompose-blue)
 
