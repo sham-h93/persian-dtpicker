@@ -28,7 +28,7 @@ data class SimpleDate(
 
     companion object {
         /**
-         * Represents current date and time (either gregorian or jalali) as a `SimpleDate` object.
+         * Represents current jalali date and time as a `SimpleDate` object.
          * */
         fun now(context: Context): SimpleDate {
             val date = DatePickerUtils.currentJalaliDate()
@@ -51,7 +51,7 @@ data class SimpleDate(
         }
 
         /**
-         * This function converts a timestamp (in milliseconds) to a `SimpleDate` object.
+         * This function converts a timestamp (in milliseconds) to a jalali `SimpleDate` object.
          *
          * * `timestamp`: The timestamp in milliseconds.
          * */

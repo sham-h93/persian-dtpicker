@@ -1,5 +1,6 @@
 package com.hshamkhani.persian_dtpicker
 
+import android.content.Context
 import android.os.Bundle
 import androidx.activity.ComponentActivity
 import androidx.activity.compose.setContent
@@ -11,6 +12,7 @@ import androidx.compose.foundation.layout.padding
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Scaffold
 import androidx.compose.material3.Text
+import androidx.compose.runtime.Composable
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
@@ -20,7 +22,9 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.unit.dp
 import com.hshamkhani.persian_dtpicker.ui.theme.PersiandtpickerTheme
 import com.hshamkhani.persiandtpicker.picker.PersianDatePicker
+import com.hshamkhani.persiandtpicker.picker.TimePicker
 import com.hshamkhani.persiandtpicker.utils.SimpleDate
+import com.hshamkhani.persiandtpicker.utils.SimpleTime
 
 class MainActivity : ComponentActivity() {
     override fun onCreate(savedInstanceState: Bundle?) {
@@ -62,4 +66,36 @@ class MainActivity : ComponentActivity() {
             }
         }
     }
+}
+
+
+@Composable
+fun PersianDtPickerExample(
+    modifier: Modifier = Modifier,
+    context: Context
+) {
+    var selectedDate by remember { mutableStateOf(SimpleDate.now(context = context)) }
+
+    PersianDatePicker(
+        modifier = modifier,
+        withTimePicker = true,
+        onDateSelected = { date: SimpleDate ->
+            selectedDate = date
+        },
+    )
+}
+
+@Composable
+fun TimePickerExample(
+    modifier: Modifier = Modifier,
+    context: Context
+) {
+    var selectedDate by remember { mutableStateOf(SimpleTime.now(context = context)) }
+
+    TimePicker(
+        modifier = modifier,
+        onTimeChanged = { time: SimpleTime ->
+            selectedDate = time
+        },
+    )
 }
