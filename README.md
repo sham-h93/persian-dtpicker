@@ -3,7 +3,7 @@
 
 [![](https://jitpack.io/v/sham-h93/persian-dtpicker.svg)](https://jitpack.io/#sham-h93/persian-dtpicker) ![Android lib](https://img.shields.io/badge/Android-green) ![JetpackCompose](https://img.shields.io/badge/JetpackCompose-blue)
 
-A simple, minimal and fully customizable Persian Date Picker for Jetpack Compose.
+A simple, minimal, and fully customizable Persian Date Picker for Jetpack Compose.
 
 ## Installation
 
@@ -23,12 +23,11 @@ A simple, minimal and fully customizable Persian Date Picker for Jetpack Compose
 
 ```css
 dependencies {
-		implementation("com.github.sham-h93:persian-dtpicker:<latest-version>")
+	implementation("com.github.sham-h93:persian-dtpicker:<latest-version>")
 }
 ```
-
-### Usage
 ---
+### Usage
 
 Minimal usage of `PersianDatePicker` with a time picker:
 >You can also use it without time picker by setting property  `withTimePicker` to ` false`.
@@ -73,7 +72,7 @@ fun TimePickerExample(
     )
 }
 ```
----
+## More Details
 |*Class*| *Description* |
 |---|---|
 |`data class SimpleDate`|Represents a simple date (either gregorian or jalali) with year, month, day, and an optional `SimpleTime` object.|
@@ -81,7 +80,6 @@ fun TimePickerExample(
 |`enum class ClockPeriod`|Clock period (`Am`, `Pm`) for a clock in 12-hour time format.|
 
 ---
-
 
 |*Function*| *Description* |
 |---|---|
@@ -91,3 +89,6 @@ fun TimePickerExample(
 |||	
 | `fun SimpleDate.toCalendar(): Calendar` | Converts a Gregorian `SimpleDate` to a Calendar object. |
 |`fun SimpleDate.totGregorianDate(): SimpleDate`|Converts a Jalali `SimpleDate` to a Gregorian `SimpleDate`.|
+
+## 👥 Contributing
+I sincerely welcome your contributions to the Persian Date Picker project! I would love to have your help in making *PersianDatePicker* better.
