@@ -23,6 +23,7 @@ data class SimpleDate(
     val year: Int,
     val month: Int,
     val day: Int,
+    val dayOfWeek: Int,
     val time: SimpleTime = SimpleTime()
 ) {
 
@@ -32,20 +33,21 @@ data class SimpleDate(
          * */
         fun now(context: Context): SimpleDate {
             val date = DatePickerUtils.currentJalaliDate()
-            val time = LocalTime.now(ZoneId.systemDefault())
+            val dateTime = LocalDateTime.now(ZoneId.systemDefault())
             val is24Hour = DateFormat.is24HourFormat(context)
 
             return SimpleDate(
                 year = date.component1(),
                 month = date.component2(),
                 day = date.component3(),
+                dayOfWeek = dateTime.dayOfWeek.value,
                 time = SimpleTime(
-                    hour = time.hour,
-                    minute = time.minute,
+                    hour = dateTime.hour,
+                    minute = dateTime.minute,
                     clockPeriod = if (is24Hour) null else {
-                        if (time.hour < 12) ClockPeriod.Am else ClockPeriod.Pm
+                        if (dateTime.hour < 12) ClockPeriod.Am else ClockPeriod.Pm
                     }
-                )
+                ),
             )
 
         }
@@ -69,18 +71,19 @@ data class SimpleDate(
                 gd = localDateTime.dayOfMonth
             )
 
-            val time = LocalTime.now(ZoneId.systemDefault())
+            val dateTime = LocalDateTime.now(ZoneId.systemDefault())
             val is24Hour = DateFormat.is24HourFormat(context)
 
             return SimpleDate(
                 year = jalaliDt.component1(),
                 month = jalaliDt.component2(),
                 day = jalaliDt.component3(),
+                dayOfWeek = dateTime.dayOfWeek.value,
                 time = SimpleTime(
-                    hour = time.hour,
-                    minute = time.minute,
+                    hour = dateTime.hour,
+                    minute = dateTime.minute,
                     clockPeriod = if (is24Hour) null else {
-                        if (time.hour < 12) ClockPeriod.Am else ClockPeriod.Pm
+                        if (dateTime.hour < 12) ClockPeriod.Am else ClockPeriod.Pm
                     }
                 )
             )
@@ -146,6 +149,7 @@ fun SimpleDate.totGregorianDate(): SimpleDate {
         year = year,
         month = month,
         day = day,
+        dayOfWeek = dayOfWeek,
         time = time
     )
 }

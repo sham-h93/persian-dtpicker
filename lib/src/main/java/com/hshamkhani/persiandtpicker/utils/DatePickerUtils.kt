@@ -4,8 +4,33 @@ import com.hshamkhani.persiandtpicker.utils.PersianNumberUtils.padZeroToStartWit
 import java.time.LocalDate
 import java.time.LocalTime
 import java.time.ZoneId
+import java.util.Locale
 
 internal object DatePickerUtils {
+
+    private val englishWeekDays = listOf(
+        "Saturday",
+        "Sunday",
+        "Monday",
+        "Tuesday",
+        "Wednesday",
+        "Thursday",
+        "Friday",
+    )
+
+    private val persianWeekDays = listOf(
+        "شنیه",
+        "یکشنبه",
+        "دوشنبه",
+        "سه شنبه",
+        "چهارشنبه",
+        "پتج شنبه",
+        "جمعه",
+    )
+
+    fun weekDays() = if (Locale.getDefault().language == "fa") persianWeekDays else englishWeekDays
+
+    fun dayOfWeek(): Int = LocalDate.now().dayOfWeek.value - 1
 
     fun initHours(is24h: Boolean): List<String> {
         val values = mutableListOf<String>()

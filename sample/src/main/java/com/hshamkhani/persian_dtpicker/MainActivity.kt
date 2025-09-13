@@ -6,8 +6,10 @@ import androidx.activity.ComponentActivity
 import androidx.activity.compose.setContent
 import androidx.activity.enableEdgeToEdge
 import androidx.compose.foundation.layout.Arrangement
+import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.fillMaxSize
+import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.padding
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Scaffold
@@ -21,6 +23,7 @@ import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.unit.dp
 import com.hshamkhani.persian_dtpicker.ui.theme.PersiandtpickerTheme
+import com.hshamkhani.persiandtpicker.calendar.PersianCalendar
 import com.hshamkhani.persiandtpicker.picker.PersianDatePicker
 import com.hshamkhani.persiandtpicker.picker.TimePicker
 import com.hshamkhani.persiandtpicker.utils.SimpleDate
@@ -31,43 +34,58 @@ class MainActivity : ComponentActivity() {
         super.onCreate(savedInstanceState)
         enableEdgeToEdge()
         setContent {
-
-            var selectedDate by remember { mutableStateOf(SimpleDate(0, 0, 0)) }
-
             PersiandtpickerTheme {
                 Scaffold(modifier = Modifier.fillMaxSize()) { innerPadding ->
-                    Column(
-                        modifier = Modifier
-                            .padding(innerPadding)
-                            .fillMaxSize(),
-                        horizontalAlignment = Alignment.CenterHorizontally,
-                        verticalArrangement = Arrangement.spacedBy(8.dp, Alignment.CenterVertically)
-                    ) {
-                        Text(
-                            modifier = Modifier
-                                .padding(16.dp),
-                            style = MaterialTheme.typography.titleLarge,
-                            text = "$selectedDate"
-                        )
-
-                        PersianDatePicker(
-                            withTimePicker = true,
-                            onDateSelected = { date ->
-                                selectedDate = date
-                            },
-                            textStyle = MaterialTheme.typography.titleLarge,
-                            textColor = MaterialTheme.colorScheme.onBackground,
-                            selectedTextColor = MaterialTheme.colorScheme.onBackground,
-                            backGroundColor = MaterialTheme.colorScheme.background,
-                            selectedItemBackgroundColor = MaterialTheme.colorScheme.surfaceContainerHighest,
-                        )
-                    }
+                    SamplePersianCalendar(modifier = Modifier.padding(innerPadding))
                 }
             }
         }
     }
 }
 
+@Composable
+fun SamplePersianCalendar(
+    modifier: Modifier = Modifier,
+) {
+    Box(
+        modifier = modifier,
+        contentAlignment = Alignment.Center
+    ) {
+        PersianCalendar(modifier = Modifier.fillMaxSize())
+    }
+}
+
+@Composable
+fun SamplePersianDatePicker(
+    modifier: Modifier = Modifier,
+    context: Context
+) {
+    var selectedDate by remember { mutableStateOf(SimpleDate(0, 0, 0)) }
+    Column(
+        modifier = Modifier.fillMaxSize(),
+        horizontalAlignment = Alignment.CenterHorizontally,
+        verticalArrangement = Arrangement.spacedBy(8.dp, Alignment.CenterVertically)
+    ) {
+        Text(
+            modifier = Modifier
+                .padding(16.dp),
+            style = MaterialTheme.typography.titleLarge,
+            text = "$selectedDate"
+        )
+
+        PersianDatePicker(
+            withTimePicker = true,
+            onDateSelected = { date ->
+                selectedDate = date
+            },
+            textStyle = MaterialTheme.typography.titleLarge,
+            textColor = MaterialTheme.colorScheme.onBackground,
+            selectedTextColor = MaterialTheme.colorScheme.onBackground,
+            backGroundColor = MaterialTheme.colorScheme.background,
+            selectedItemBackgroundColor = MaterialTheme.colorScheme.surfaceContainerHighest,
+        )
+    }
+}
 
 @Composable
 fun PersianDtPickerExample(
