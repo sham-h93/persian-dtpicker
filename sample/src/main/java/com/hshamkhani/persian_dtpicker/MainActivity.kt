@@ -21,6 +21,7 @@ import androidx.compose.runtime.remember
 import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.unit.dp
 import com.hshamkhani.persian_dtpicker.ui.theme.PersiandtpickerTheme
 import com.hshamkhani.persiandtpicker.calendar.PersianCalendar
@@ -47,11 +48,20 @@ class MainActivity : ComponentActivity() {
 fun SamplePersianCalendar(
     modifier: Modifier = Modifier,
 ) {
+    val context = LocalContext.current
+    var selectedDate by remember { mutableStateOf(SimpleDate.now(context = context)) }
+
     Box(
         modifier = modifier,
         contentAlignment = Alignment.Center
     ) {
-        PersianCalendar(modifier = Modifier.fillMaxSize())
+        PersianCalendar(
+            modifier = Modifier.fillMaxSize(),
+            selectedDate = selectedDate,
+            onDateSelected = { simpleDate ->
+                selectedDate = simpleDate
+            }
+        )
     }
 }
 
