@@ -23,7 +23,6 @@ data class SimpleDate(
     val year: Int,
     val month: Int,
     val day: Int,
-    val dayOfWeek: Int,
     val time: SimpleTime = SimpleTime()
 ) {
 
@@ -40,7 +39,6 @@ data class SimpleDate(
                 year = date.component1(),
                 month = date.component2(),
                 day = date.component3(),
-                dayOfWeek = dateTime.dayOfWeek.value,
                 time = SimpleTime(
                     hour = dateTime.hour,
                     minute = dateTime.minute,
@@ -78,7 +76,6 @@ data class SimpleDate(
                 year = jalaliDt.component1(),
                 month = jalaliDt.component2(),
                 day = jalaliDt.component3(),
-                dayOfWeek = dateTime.dayOfWeek.value,
                 time = SimpleTime(
                     hour = dateTime.hour,
                     minute = dateTime.minute,
@@ -149,7 +146,6 @@ fun SimpleDate.totGregorianDate(): SimpleDate {
         year = year,
         month = month,
         day = day,
-        dayOfWeek = dayOfWeek,
         time = time
     )
 }

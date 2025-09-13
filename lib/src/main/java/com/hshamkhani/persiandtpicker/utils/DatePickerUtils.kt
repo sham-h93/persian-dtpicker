@@ -1,5 +1,6 @@
 package com.hshamkhani.persiandtpicker.utils
 
+import android.icu.util.Calendar
 import com.hshamkhani.persiandtpicker.utils.PersianNumberUtils.padZeroToStartWithPersianDigits
 import java.time.LocalDate
 import java.time.LocalTime
@@ -30,7 +31,19 @@ internal object DatePickerUtils {
 
     fun weekDays() = if (Locale.getDefault().language == "fa") persianWeekDays else englishWeekDays
 
-    fun dayOfWeek(): Int = LocalDate.now().dayOfWeek.value - 1
+    fun SimpleDate.dayOfWeek(): Int {
+        val day = totGregorianDate().toCalendar().get(Calendar.DAY_OF_WEEK)
+        return when (day) {
+            Calendar.SATURDAY -> 1
+            Calendar.SUNDAY -> 2
+            Calendar.MONDAY -> 2
+            Calendar.TUESDAY -> 4
+            Calendar.WEDNESDAY -> 5
+            Calendar.THURSDAY -> 6
+            Calendar.FRIDAY -> 7
+            else -> 0
+        }
+    }
 
     fun initHours(is24h: Boolean): List<String> {
         val values = mutableListOf<String>()

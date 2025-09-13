@@ -1,13 +1,16 @@
 package com.hshamkhani.persiandtpicker.calendar
 
+import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.FlowRow
 import androidx.compose.foundation.layout.Row
+import androidx.compose.foundation.layout.aspectRatio
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
@@ -17,6 +20,7 @@ import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.text.TextStyle
 import androidx.compose.ui.text.intl.Locale
 import com.hshamkhani.persiandtpicker.utils.DatePickerUtils
+import com.hshamkhani.persiandtpicker.utils.DatePickerUtils.dayOfWeek
 import com.hshamkhani.persiandtpicker.utils.PersianNumberUtils.formatToHindiIfLanguageIsFa
 import com.hshamkhani.persiandtpicker.utils.SimpleDate
 
@@ -49,22 +53,22 @@ fun PersianCalendar(
         )
     }
 
-    // Calculate the starting weekday of the month (0 = Saturday, 6 = Friday)
-    val firstDayOfMonthWeekday by remember(simpleDate.month, simpleDate.year) {
+    var daysList by remember(daysInMonth) {
         mutableStateOf(
-            calculateFirstDayOfMonthWeekday(simpleDate.month, simpleDate.year)
+            (1..daysInMonth).map {
+                it.toString().formatToHindiIfLanguageIsFa()
+            }
         )
     }
 
-    // Create list with empty strings for days before the 1st
-    val daysList by remember(daysInMonth, firstDayOfMonthWeekday) {
-        mutableStateOf(
-            List(firstDayOfMonthWeekday) { "" } + (1..daysInMonth)
-                .map {
-                    it.toString().formatToHindiIfLanguageIsFa()
-                }
-        )
+    LaunchedEffect(daysInMonth) {
+        val start = simpleDate.copy(day = 1).dayOfWeek()
+        val end = simpleDate.copy(day = daysInMonth).dayOfWeek() % 7
+        val padStart = List(start) { "" }
+        val padEnd = List(end) { "" }
+        daysList = padStart + daysList + padEnd
     }
+
 
     Column(
         modifier = modifier
@@ -76,6 +80,9 @@ fun PersianCalendar(
         ) {
             DatePickerUtils.weekDays().forEach { weekDay ->
                 Text(
+                    modifier = Modifier
+                        .weight(1f)
+                        .aspectRatio(1f),
                     text = weekDay.take(3),
                     style = textStyle
                 )
@@ -90,19 +97,14 @@ fun PersianCalendar(
         ) {
             daysList.forEach { day ->
                 Text(
+                    modifier = Modifier
+                        .weight(1f)
+                        .aspectRatio(1f)
+                        .clickable(onClick = {}),
                     text = day,
                     style = textStyle
                 )
             }
         }
     }
-}
-
-// Function to calculate the weekday of the first day of the month
-// Returns 0 for Saturday, 1 for Sunday, ..., 6 for Friday
-fun calculateFirstDayOfMonthWeekday(month: Int, year: Int): Int {
-    // This is a simplified implementation - you'll need to replace with actual Persian calendar logic
-    // For now, using a placeholder that assumes a fixed pattern
-    val baseDay = (year * 12 + month) % 7 // This is just an example
-    return (baseDay + 1) % 7 // Adjust based on your calendar's starting day
 }
