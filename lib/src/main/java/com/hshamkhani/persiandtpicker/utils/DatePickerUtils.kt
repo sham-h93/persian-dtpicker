@@ -176,7 +176,7 @@ internal object DatePickerUtils {
      * Returns a list of integers representing the days in a month
      * */
 
-    fun monthLength(monthNumber: Int, year: Int): List<Int> {
+    fun initMonthDays(monthNumber: Int, year: Int): List<Int> {
         val days29 = (1..29).map { it }
         val days30 = (1..30).map { it }
         val days31 = (1..31).map { it }

@@ -56,11 +56,19 @@ fun SamplePersianCalendar(
         contentAlignment = Alignment.Center
     ) {
         PersianCalendar(
-            modifier = Modifier.fillMaxSize(),
+            modifier = Modifier.fillMaxWidth(),
+            dayAlign = Alignment.TopStart,
+            textStyle = MaterialTheme.typography.titleMedium,
             textColor = MaterialTheme.colorScheme.onBackground,
             selectedTextColor = MaterialTheme.colorScheme.onBackground,
             backGroundColor = MaterialTheme.colorScheme.background,
             selectedItemBackgroundColor = MaterialTheme.colorScheme.primaryContainer,
+            dayContent = { day, isSelected ->
+                if (isSelected) Text(
+                    modifier = Modifier.align(Alignment.Center),
+                    text = "+"
+                )
+            },
             selectedDate = selectedDate,
             onDateSelected = { simpleDate ->
                 selectedDate = simpleDate

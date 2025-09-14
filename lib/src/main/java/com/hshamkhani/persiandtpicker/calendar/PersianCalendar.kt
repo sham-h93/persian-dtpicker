@@ -5,6 +5,7 @@ import androidx.compose.foundation.border
 import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
+import androidx.compose.foundation.layout.BoxScope
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.FlowRow
 import androidx.compose.foundation.layout.Row
@@ -15,8 +16,6 @@ import androidx.compose.foundation.layout.padding
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.automirrored.filled.KeyboardArrowLeft
 import androidx.compose.material.icons.automirrored.filled.KeyboardArrowRight
-import androidx.compose.material3.Icon
-import androidx.compose.material3.IconButton
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
@@ -29,15 +28,16 @@ import androidx.compose.runtime.remember
 import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.draw.clip
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.text.TextStyle
 import androidx.compose.ui.text.font.FontFamily
-import androidx.compose.ui.text.intl.Locale
 import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.text.style.TextOverflow
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
+import com.hshamkhani.persiandtpicker.components.FlatIconButton
 import com.hshamkhani.persiandtpicker.utils.DatePickerUtils
 import com.hshamkhani.persiandtpicker.utils.DatePickerUtils.dayOfWeek
 import com.hshamkhani.persiandtpicker.utils.PersianNumberUtils.asStringMonthName
@@ -55,6 +55,7 @@ fun PersianCalendar(
     selectedTextColor: Color = MaterialTheme.colorScheme.primary,
     backGroundColor: Color = MaterialTheme.colorScheme.background,
     selectedItemBackgroundColor: Color = MaterialTheme.colorScheme.surfaceContainerLowest,
+    dayContent: @Composable BoxScope.(String, Boolean) -> Unit = { day, isSelected -> },
     selectedDate: SimpleDate? = null,
     onDateSelected: (date: SimpleDate) -> Unit,
 ) {
@@ -65,7 +66,10 @@ fun PersianCalendar(
 
     val daysInMonth by remember(simpleDate.month) {
         mutableIntStateOf(
-            DatePickerUtils.monthLength(simpleDate.month, simpleDate.year).size
+            DatePickerUtils.initMonthDays(
+                monthNumber = simpleDate.month,
+                year = simpleDate.year
+            ).size
         )
     }
 
@@ -98,9 +102,10 @@ fun PersianCalendar(
             horizontalArrangement = Arrangement.Center,
             verticalAlignment = Alignment.CenterVertically
         ) {
-            IconButton(
+            FlatIconButton(
+                icon = Icons.AutoMirrored.Default.KeyboardArrowLeft,
                 onClick = {
-                    if (initialDate.month == simpleDate.month && initialDate.year == simpleDate.year) return@IconButton
+                    if (initialDate.month == simpleDate.month && initialDate.year == simpleDate.year) return@FlatIconButton
                     simpleDate = if (simpleDate.month == 1) {
                         simpleDate.copy(
                             month = 12,
@@ -112,12 +117,7 @@ fun PersianCalendar(
                         )
                     }
                 }
-            ) {
-                Icon(
-                    imageVector = Icons.AutoMirrored.Default.KeyboardArrowLeft,
-                    contentDescription = null
-                )
-            }
+            )
 
             Text(
                 modifier = Modifier
@@ -150,7 +150,8 @@ fun PersianCalendar(
                     fontSize = 24.sp
                 )
             )
-            IconButton(
+            FlatIconButton(
+                icon = Icons.AutoMirrored.Default.KeyboardArrowRight,
                 onClick = {
                     simpleDate = if (simpleDate.month == 12) {
                         simpleDate.copy(
@@ -163,12 +164,7 @@ fun PersianCalendar(
                         )
                     }
                 }
-            ) {
-                Icon(
-                    imageVector = Icons.AutoMirrored.Default.KeyboardArrowRight,
-                    contentDescription = null
-                )
-            }
+            )
         }
 
         // Weekday headers
@@ -188,7 +184,7 @@ fun PersianCalendar(
                     overflow = TextOverflow.Clip,
                     textAlign = TextAlign.Center,
                     fontFamily = fontFamily,
-                    style = textStyle
+                    style = MaterialTheme.typography.bodyLarge
                 )
             }
         }
@@ -198,7 +194,8 @@ fun PersianCalendar(
             modifier = Modifier.fillMaxWidth(),
             horizontalArrangement = Arrangement.SpaceAround,
             itemVerticalAlignment = Alignment.CenterVertically,
-            maxItemsInEachRow = 7
+            maxItemsInEachRow = 7,
+            maxLines = 5
         ) {
             daysList.value.forEach { day ->
                 val isDay = day.isNotBlank()
@@ -209,14 +206,14 @@ fun PersianCalendar(
                         .aspectRatio(1f)
                         .background(
                             if (isCurrentDay) {
-                                selectedItemBackgroundColor
+                                Color.Transparent
                             } else {
                                 backGroundColor
                             }
                         )
                         .border(
-                            width = .5.dp,
-                            color = if (isDay) {
+                            width = 1.dp,
+                            color = if (isCurrentDay) {
                                 selectedItemBackgroundColor
                             } else {
                                 Color.Transparent
@@ -228,10 +225,11 @@ fun PersianCalendar(
                             }
                         }),
                 ) {
+                    dayContent(day, isCurrentDay)
                     Text(
                         modifier = Modifier
-                            .padding(4.dp)
-                            .align(dayAlign),
+                            .align(dayAlign)
+                            .padding(4.dp),
                         text = day,
                         fontFamily = fontFamily,
                         style = textStyle,
