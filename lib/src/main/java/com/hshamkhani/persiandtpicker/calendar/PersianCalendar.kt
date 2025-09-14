@@ -35,6 +35,7 @@ import androidx.compose.ui.text.TextStyle
 import androidx.compose.ui.text.font.FontFamily
 import androidx.compose.ui.text.intl.Locale
 import androidx.compose.ui.text.style.TextAlign
+import androidx.compose.ui.text.style.TextOverflow
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import com.hshamkhani.persiandtpicker.utils.DatePickerUtils
@@ -182,7 +183,9 @@ fun PersianCalendar(
                         .weight(1f)
                         .background(selectedItemBackgroundColor)
                         .padding(vertical = 4.dp),
-                    text = weekDay.take(3).uppercase(),
+                    text = weekDay.uppercase(),
+                    maxLines = 1,
+                    overflow = TextOverflow.Clip,
                     textAlign = TextAlign.Center,
                     fontFamily = fontFamily,
                     style = textStyle

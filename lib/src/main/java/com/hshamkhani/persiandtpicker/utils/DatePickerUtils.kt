@@ -21,11 +21,11 @@ internal object DatePickerUtils {
 
     private val persianWeekDays = listOf(
         "شنیه",
-        "یکشنبه",
+        "یک\u200Cشنبه",
         "دوشنبه",
-        "سه شنبه",
+        "سه\u200Cشنبه",
         "چهارشنبه",
-        "پتج شنبه",
+        "پتج\u200Cشنبه",
         "جمعه",
     )
 
