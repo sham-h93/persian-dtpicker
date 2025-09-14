@@ -11,11 +11,18 @@ import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.aspectRatio
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.padding
+import androidx.compose.material.icons.Icons
+import androidx.compose.material.icons.automirrored.filled.KeyboardArrowLeft
+import androidx.compose.material.icons.automirrored.filled.KeyboardArrowRight
+import androidx.compose.material3.Icon
+import androidx.compose.material3.IconButton
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
+import androidx.compose.runtime.derivedStateOf
 import androidx.compose.runtime.getValue
+import androidx.compose.runtime.mutableIntStateOf
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
 import androidx.compose.runtime.setValue
@@ -24,13 +31,16 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.text.TextStyle
+import androidx.compose.ui.text.buildAnnotatedString
 import androidx.compose.ui.text.font.FontFamily
 import androidx.compose.ui.text.intl.Locale
 import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.unit.dp
+import androidx.compose.ui.unit.sp
 import com.hshamkhani.persiandtpicker.utils.DatePickerUtils
 import com.hshamkhani.persiandtpicker.utils.DatePickerUtils.dayOfWeek
 import com.hshamkhani.persiandtpicker.utils.PersianNumberUtils.formatToHindiIfLanguageIsFa
+import com.hshamkhani.persiandtpicker.utils.PersianNumberUtils.padZeroToStartWithPersianDigits
 import com.hshamkhani.persiandtpicker.utils.SimpleDate
 
 @Composable
@@ -65,27 +75,29 @@ fun PersianCalendar(
     }
 
     val daysInMonth by remember(simpleDate.month) {
-        mutableStateOf(
+        mutableIntStateOf(
             DatePickerUtils.monthLength(simpleDate.month, simpleDate.year).size
         )
     }
 
-    var daysList by remember(daysInMonth) {
-        mutableStateOf(
-            (1..daysInMonth).map {
+    val daysList = remember(daysInMonth) {
+        derivedStateOf {
+            val start = simpleDate.copy(day = 1).dayOfWeek() - 1
+            val end = 7 - simpleDate.copy(day = daysInMonth).dayOfWeek()
+
+            val monthDays = (1..daysInMonth).map {
                 it.toString().formatToHindiIfLanguageIsFa()
             }
-        )
+            val padStart = List(start) { "" }
+            val padEnd = List(end) { "" }
+
+            padStart + monthDays + padEnd
+        }
     }
 
-    LaunchedEffect(daysInMonth) {
-        val start = simpleDate.copy(day = 1).dayOfWeek()
-        val end = 7 - simpleDate.copy(day = daysInMonth).dayOfWeek()
-        val padStart = List(start) { "" }
-        val padEnd = List(end) { "" }
-        daysList = padStart + daysList + padEnd
+    LaunchedEffect(simpleDate) {
+        onDateSelected(simpleDate)
     }
-
 
     Column(
         modifier = modifier
@@ -98,7 +110,10 @@ fun PersianCalendar(
         ) {
             DatePickerUtils.weekDays().forEach { weekDay ->
                 Text(
-                    modifier = Modifier.weight(1f),
+                    modifier = Modifier
+                        .weight(1f)
+                        .background(selectedItemBackgroundColor)
+                        .padding(vertical = 4.dp),
                     text = weekDay.take(3).uppercase(),
                     textAlign = TextAlign.Center,
                     fontFamily = fontFamily,
@@ -113,8 +128,8 @@ fun PersianCalendar(
             horizontalArrangement = Arrangement.SpaceAround,
             maxItemsInEachRow = 7
         ) {
-            daysList.forEach { day ->
-                val isDay =  day.isNotBlank()
+            daysList.value.forEach { day ->
+                val isDay = day.isNotBlank()
                 val isCurrentDay = isDay && day.toInt() == simpleDate.day
                 Box(
                     modifier = Modifier
@@ -128,17 +143,17 @@ fun PersianCalendar(
                             }
                         )
                         .border(
-                            width = 1.dp,
-                            color = if (isCurrentDay) {
-                                MaterialTheme.colorScheme.primary
+                            width = .5.dp,
+                            color = if (isDay) {
+                                selectedItemBackgroundColor
                             } else {
                                 Color.Transparent
                             },
-                            shape = MaterialTheme.shapes.medium
+//                            shape = MaterialTheme.shapes.medium
                         )
                         .clickable(onClick = {
                             if (isDay) {
-                                onDateSelected(simpleDate.copy(day = day.toInt()))
+                                simpleDate = simpleDate.copy(day = day.toInt())
                             }
                         }),
                 ) {

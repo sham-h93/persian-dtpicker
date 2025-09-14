@@ -57,6 +57,10 @@ fun SamplePersianCalendar(
     ) {
         PersianCalendar(
             modifier = Modifier.fillMaxSize(),
+            textColor = MaterialTheme.colorScheme.onBackground,
+            selectedTextColor = MaterialTheme.colorScheme.onBackground,
+            backGroundColor = MaterialTheme.colorScheme.background,
+            selectedItemBackgroundColor = MaterialTheme.colorScheme.primaryContainer,
             selectedDate = selectedDate,
             onDateSelected = { simpleDate ->
                 selectedDate = simpleDate
