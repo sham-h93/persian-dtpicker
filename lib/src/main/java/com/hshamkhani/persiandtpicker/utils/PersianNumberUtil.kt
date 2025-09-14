@@ -6,7 +6,7 @@ import java.util.Locale
 internal object PersianNumberUtils {
 
     fun Int.padZeroToStartWithPersianDigits(): String {
-        val number =  if (this < 10) {
+        val number = if (this < 10) {
             this.toString().padStart(2, '0')
         } else {
             this.toString()
@@ -26,15 +26,15 @@ internal object PersianNumberUtils {
         val chars = this.toCharArray().map { char ->
             when (char) {
                 '0' -> '۰'
-                '1' ->  '۱'
-                '2' ->  '۲'
-                '3' ->  '۳'
-                '4' ->  '۴'
-                '5' ->  '۵'
-                '6' ->  '۶'
-                '7' ->  '۷'
-                '8' ->  '۸'
-                '9' ->  '۹'
+                '1' -> '۱'
+                '2' -> '۲'
+                '3' -> '۳'
+                '4' -> '۴'
+                '5' -> '۵'
+                '6' -> '۶'
+                '7' -> '۷'
+                '8' -> '۸'
+                '9' -> '۹'
                 else -> '۰'
             }
         }.joinToString(separator = "")
@@ -58,6 +58,25 @@ internal object PersianNumberUtils {
             }
         }.joinToString(separator = "")
         return chars.toInt()
+    }
+
+    fun Int.asStringMonthName(): String {
+        val isFa = Locale.getDefault().language == "fa"
+        return when (this) {
+            1 -> if (isFa) "فروردین" else "Farvardin"
+            2 -> if (isFa) "اردیبهشت" else "Ordibehesht"
+            3 -> if (isFa) "خرداد" else "Khordad"
+            4 -> if (isFa) "تیر" else "Tir"
+            5 -> if (isFa) "مرداد" else "Mordad"
+            6 -> if (isFa) "شهریور" else "Shahrivar"
+            7 -> if (isFa) "مهر" else "Mehr"
+            8 -> if (isFa) "آبان" else "Aban"
+            9 -> if (isFa) "آذر" else "Azar"
+            10 -> if (isFa) "دی" else "Day"
+            11 -> if (isFa) "بهمن" else "Bahman"
+            12 -> if (isFa) "اسفند" else "Esfand"
+            else -> throw IllegalArgumentException()
+        }
     }
 
 }

@@ -8,6 +8,7 @@ import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.FlowRow
 import androidx.compose.foundation.layout.Row
+import androidx.compose.foundation.layout.Spacer
 import androidx.compose.foundation.layout.aspectRatio
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.padding
@@ -19,6 +20,7 @@ import androidx.compose.material3.IconButton
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.CompositionLocalProvider
 import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.derivedStateOf
 import androidx.compose.runtime.getValue
@@ -30,15 +32,18 @@ import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.platform.LocalContext
+import androidx.compose.ui.platform.LocalLayoutDirection
 import androidx.compose.ui.text.TextStyle
 import androidx.compose.ui.text.buildAnnotatedString
 import androidx.compose.ui.text.font.FontFamily
 import androidx.compose.ui.text.intl.Locale
 import androidx.compose.ui.text.style.TextAlign
+import androidx.compose.ui.unit.LayoutDirection
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import com.hshamkhani.persiandtpicker.utils.DatePickerUtils
 import com.hshamkhani.persiandtpicker.utils.DatePickerUtils.dayOfWeek
+import com.hshamkhani.persiandtpicker.utils.PersianNumberUtils.asStringMonthName
 import com.hshamkhani.persiandtpicker.utils.PersianNumberUtils.formatToHindiIfLanguageIsFa
 import com.hshamkhani.persiandtpicker.utils.PersianNumberUtils.padZeroToStartWithPersianDigits
 import com.hshamkhani.persiandtpicker.utils.SimpleDate
@@ -102,74 +107,157 @@ fun PersianCalendar(
     Column(
         modifier = modifier
     ) {
-        // Weekday headers
-        Row(
-            modifier = Modifier.fillMaxWidth(),
-            horizontalArrangement = Arrangement.SpaceAround,
-            verticalAlignment = Alignment.CenterVertically
+        CompositionLocalProvider(
+            value = LocalLayoutDirection provides LayoutDirection.Ltr
         ) {
-            DatePickerUtils.weekDays().forEach { weekDay ->
+
+            // Month and Year
+            Row(
+                modifier = Modifier.fillMaxWidth(),
+                horizontalArrangement = Arrangement.Center,
+                verticalAlignment = Alignment.CenterVertically
+            ) {
+                IconButton(
+                    onClick = {
+                        if (initialDate.month == simpleDate.month && initialDate.year == simpleDate.year) return@IconButton
+                        simpleDate = if (simpleDate.month == 1) {
+                            simpleDate.copy(
+                                month = 12,
+                                year = simpleDate.year - 1
+                            )
+                        } else {
+                            simpleDate.copy(
+                                month = simpleDate.month - 1,
+                            )
+                        }
+                    }
+                ) {
+                    Icon(
+                        imageVector = Icons.AutoMirrored.Default.KeyboardArrowLeft,
+                        contentDescription = null
+                    )
+                }
                 Text(
                     modifier = Modifier
-                        .weight(1f)
-                        .background(selectedItemBackgroundColor)
-                        .padding(vertical = 4.dp),
-                    text = weekDay.take(3).uppercase(),
+                        .weight(1f),
+                    text =    simpleDate.year.toString().formatToHindiIfLanguageIsFa(),
                     textAlign = TextAlign.Center,
                     fontFamily = fontFamily,
-                    style = textStyle
+                    style = textStyle.copy(
+                        fontSize = 24.sp
+                    )
                 )
-            }
-        }
-
-        // Calendar days
-        FlowRow(
-            modifier = Modifier.fillMaxWidth(),
-            horizontalArrangement = Arrangement.SpaceAround,
-            maxItemsInEachRow = 7
-        ) {
-            daysList.value.forEach { day ->
-                val isDay = day.isNotBlank()
-                val isCurrentDay = isDay && day.toInt() == simpleDate.day
-                Box(
+                Spacer(modifier = Modifier.weight(1f))
+                Text(
                     modifier = Modifier
-                        .weight(1f)
-                        .aspectRatio(1f)
-                        .background(
-                            if (isCurrentDay) {
-                                selectedItemBackgroundColor
-                            } else {
-                                backGroundColor
-                            }
-                        )
-                        .border(
-                            width = .5.dp,
-                            color = if (isDay) {
-                                selectedItemBackgroundColor
-                            } else {
-                                Color.Transparent
-                            },
-//                            shape = MaterialTheme.shapes.medium
-                        )
-                        .clickable(onClick = {
-                            if (isDay) {
-                                simpleDate = simpleDate.copy(day = day.toInt())
-                            }
-                        }),
+                        .weight(1f),
+                    text =    simpleDate.month.asStringMonthName(),
+                    textAlign = TextAlign.Center,
+                    fontFamily = fontFamily,
+                    style = textStyle.copy(
+                        fontSize = 24.sp
+                    )
+                )
+                Text(
+                    modifier = Modifier
+                        .weight(1f),
+                    text = simpleDate.day.padZeroToStartWithPersianDigits(),
+                    textAlign = TextAlign.Center,
+                    fontFamily = fontFamily,
+                    style = textStyle.copy(
+                        fontSize = 24.sp
+                    )
+                )
+                IconButton(
+                    onClick = {
+                        simpleDate = if (simpleDate.month == 12) {
+                            simpleDate.copy(
+                                month = 1,
+                                year = simpleDate.year + 1
+                            )
+                        } else {
+                            simpleDate.copy(
+                                month = simpleDate.month + 1,
+                            )
+                        }
+                    }
                 ) {
+                    Icon(
+                        imageVector = Icons.AutoMirrored.Default.KeyboardArrowRight,
+                        contentDescription = null
+                    )
+                }
+            }
+
+            // Weekday headers
+            Row(
+                modifier = Modifier.fillMaxWidth(),
+                horizontalArrangement = Arrangement.SpaceAround,
+                verticalAlignment = Alignment.CenterVertically
+            ) {
+                DatePickerUtils.weekDays().forEach { weekDay ->
                     Text(
                         modifier = Modifier
-                            .padding(4.dp)
-                            .align(dayAlign),
-                        text = day,
+                            .weight(1f)
+                            .background(selectedItemBackgroundColor)
+                            .padding(vertical = 4.dp),
+                        text = weekDay.take(3).uppercase(),
+                        textAlign = TextAlign.Center,
                         fontFamily = fontFamily,
-                        style = textStyle,
-                        color = if (isCurrentDay) {
-                            selectedTextColor
-                        } else {
-                            textColor
-                        },
+                        style = textStyle
                     )
+                }
+            }
+
+            // Calendar days
+            FlowRow(
+                modifier = Modifier.fillMaxWidth(),
+                horizontalArrangement = Arrangement.SpaceAround,
+                maxItemsInEachRow = 7
+            ) {
+                daysList.value.forEach { day ->
+                    val isDay = day.isNotBlank()
+                    val isCurrentDay = isDay && day.toInt() == simpleDate.day
+                    Box(
+                        modifier = Modifier
+                            .weight(1f)
+                            .aspectRatio(1f)
+                            .background(
+                                if (isCurrentDay) {
+                                    selectedItemBackgroundColor
+                                } else {
+                                    backGroundColor
+                                }
+                            )
+                            .border(
+                                width = .5.dp,
+                                color = if (isDay) {
+                                    selectedItemBackgroundColor
+                                } else {
+                                    Color.Transparent
+                                },
+//                            shape = MaterialTheme.shapes.medium
+                            )
+                            .clickable(onClick = {
+                                if (isDay) {
+                                    simpleDate = simpleDate.copy(day = day.toInt())
+                                }
+                            }),
+                    ) {
+                        Text(
+                            modifier = Modifier
+                                .padding(4.dp)
+                                .align(dayAlign),
+                            text = day,
+                            fontFamily = fontFamily,
+                            style = textStyle,
+                            color = if (isCurrentDay) {
+                                selectedTextColor
+                            } else {
+                                textColor
+                            },
+                        )
+                    }
                 }
             }
         }

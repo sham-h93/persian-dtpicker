@@ -29,6 +29,36 @@ internal object DatePickerUtils {
         "جمعه",
     )
 
+    private val farsiMonthNames = listOf(
+        "فروردین",
+        "اردیبهشت",
+        "خرداد",
+        "تیر",
+        "مرداد",
+        "شهریور",
+        "مهر",
+        "آبان",
+        "آذر",
+        "دی",
+        "بهمن",
+        "اسفند"
+    )
+
+    private val englishMonthNames = listOf(
+        "Farvardin",
+        "Ordibehesht",
+        "Khordad",
+        "Tir",
+        "Mordad",
+        "Shahrivar",
+        "Mehr",
+        "Aban",
+        "Azar",
+        "Day",
+        "Bahman",
+        "Esfand"
+    )
+
     fun weekDays() = if (Locale.getDefault().language == "fa") persianWeekDays else englishWeekDays
 
     fun SimpleDate.dayOfWeek(): Int {
@@ -79,39 +109,13 @@ internal object DatePickerUtils {
     }
 
     fun initMonthList(isEng: Boolean): List<String> {
-        val values: MutableList<String>
+        val values: List<String>
         repeat(12) {
         }
         if (isEng) {
-            values = mutableListOf(
-                "Farvardin",
-                "Ordibehesht",
-                "Khordad",
-                "Tir",
-                "Mordad",
-                "Shahrivar",
-                "Mehr",
-                "Aban",
-                "Azar",
-                "Day",
-                "Bahman",
-                "Esfand"
-            )
+            values = englishMonthNames
         } else {
-            values = mutableListOf(
-                "فروردین",
-                "اردیبهشت",
-                "خرداد",
-                "تیر",
-                "مرداد",
-                "شهریور",
-                "مهر",
-                "آبان",
-                "آذر",
-                "دی",
-                "بهمن",
-                "اسفند"
-            )
+            values = farsiMonthNames
         }
         return values
     }
