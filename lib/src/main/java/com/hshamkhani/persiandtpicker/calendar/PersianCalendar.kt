@@ -20,7 +20,6 @@ import androidx.compose.material3.IconButton
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
-import androidx.compose.runtime.CompositionLocalProvider
 import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.derivedStateOf
 import androidx.compose.runtime.getValue
@@ -32,13 +31,10 @@ import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.platform.LocalContext
-import androidx.compose.ui.platform.LocalLayoutDirection
 import androidx.compose.ui.text.TextStyle
-import androidx.compose.ui.text.buildAnnotatedString
 import androidx.compose.ui.text.font.FontFamily
 import androidx.compose.ui.text.intl.Locale
 import androidx.compose.ui.text.style.TextAlign
-import androidx.compose.ui.unit.LayoutDirection
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import com.hshamkhani.persiandtpicker.utils.DatePickerUtils
@@ -61,23 +57,10 @@ fun PersianCalendar(
     selectedDate: SimpleDate? = null,
     onDateSelected: (date: SimpleDate) -> Unit,
 ) {
-    val isEng = Locale.current.language != "fa"
     val context = LocalContext.current
 
     val initialDate by remember { mutableStateOf(SimpleDate.now(context = context)) }
     var simpleDate by remember { mutableStateOf(selectedDate ?: initialDate) }
-
-    val years by remember {
-        mutableStateOf(
-            DatePickerUtils.initYearList(initialDate.year)
-                .map { it.toString().formatToHindiIfLanguageIsFa() })
-    }
-
-    val months by remember {
-        mutableStateOf(
-            DatePickerUtils.initMonthList(isEng = isEng)
-        )
-    }
 
     val daysInMonth by remember(simpleDate.month) {
         mutableIntStateOf(
@@ -235,7 +218,6 @@ fun PersianCalendar(
                             } else {
                                 Color.Transparent
                             },
-//                            shape = MaterialTheme.shapes.medium
                         )
                         .clickable(onClick = {
                             if (isDay) {
