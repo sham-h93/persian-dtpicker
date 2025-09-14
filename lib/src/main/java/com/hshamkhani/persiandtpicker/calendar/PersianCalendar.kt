@@ -107,157 +107,155 @@ fun PersianCalendar(
     Column(
         modifier = modifier
     ) {
-        CompositionLocalProvider(
-            value = LocalLayoutDirection provides LayoutDirection.Ltr
+
+        // Month and Year
+        Row(
+            modifier = Modifier.fillMaxWidth(),
+            horizontalArrangement = Arrangement.Center,
+            verticalAlignment = Alignment.CenterVertically
         ) {
-
-            // Month and Year
-            Row(
-                modifier = Modifier.fillMaxWidth(),
-                horizontalArrangement = Arrangement.Center,
-                verticalAlignment = Alignment.CenterVertically
-            ) {
-                IconButton(
-                    onClick = {
-                        if (initialDate.month == simpleDate.month && initialDate.year == simpleDate.year) return@IconButton
-                        simpleDate = if (simpleDate.month == 1) {
-                            simpleDate.copy(
-                                month = 12,
-                                year = simpleDate.year - 1
-                            )
-                        } else {
-                            simpleDate.copy(
-                                month = simpleDate.month - 1,
-                            )
-                        }
-                    }
-                ) {
-                    Icon(
-                        imageVector = Icons.AutoMirrored.Default.KeyboardArrowLeft,
-                        contentDescription = null
-                    )
-                }
-                Text(
-                    modifier = Modifier
-                        .weight(1f),
-                    text =    simpleDate.year.toString().formatToHindiIfLanguageIsFa(),
-                    textAlign = TextAlign.Center,
-                    fontFamily = fontFamily,
-                    style = textStyle.copy(
-                        fontSize = 24.sp
-                    )
-                )
-                Spacer(modifier = Modifier.weight(1f))
-                Text(
-                    modifier = Modifier
-                        .weight(1f),
-                    text =    simpleDate.month.asStringMonthName(),
-                    textAlign = TextAlign.Center,
-                    fontFamily = fontFamily,
-                    style = textStyle.copy(
-                        fontSize = 24.sp
-                    )
-                )
-                Text(
-                    modifier = Modifier
-                        .weight(1f),
-                    text = simpleDate.day.padZeroToStartWithPersianDigits(),
-                    textAlign = TextAlign.Center,
-                    fontFamily = fontFamily,
-                    style = textStyle.copy(
-                        fontSize = 24.sp
-                    )
-                )
-                IconButton(
-                    onClick = {
-                        simpleDate = if (simpleDate.month == 12) {
-                            simpleDate.copy(
-                                month = 1,
-                                year = simpleDate.year + 1
-                            )
-                        } else {
-                            simpleDate.copy(
-                                month = simpleDate.month + 1,
-                            )
-                        }
-                    }
-                ) {
-                    Icon(
-                        imageVector = Icons.AutoMirrored.Default.KeyboardArrowRight,
-                        contentDescription = null
-                    )
-                }
-            }
-
-            // Weekday headers
-            Row(
-                modifier = Modifier.fillMaxWidth(),
-                horizontalArrangement = Arrangement.SpaceAround,
-                verticalAlignment = Alignment.CenterVertically
-            ) {
-                DatePickerUtils.weekDays().forEach { weekDay ->
-                    Text(
-                        modifier = Modifier
-                            .weight(1f)
-                            .background(selectedItemBackgroundColor)
-                            .padding(vertical = 4.dp),
-                        text = weekDay.take(3).uppercase(),
-                        textAlign = TextAlign.Center,
-                        fontFamily = fontFamily,
-                        style = textStyle
-                    )
-                }
-            }
-
-            // Calendar days
-            FlowRow(
-                modifier = Modifier.fillMaxWidth(),
-                horizontalArrangement = Arrangement.SpaceAround,
-                maxItemsInEachRow = 7
-            ) {
-                daysList.value.forEach { day ->
-                    val isDay = day.isNotBlank()
-                    val isCurrentDay = isDay && day.toInt() == simpleDate.day
-                    Box(
-                        modifier = Modifier
-                            .weight(1f)
-                            .aspectRatio(1f)
-                            .background(
-                                if (isCurrentDay) {
-                                    selectedItemBackgroundColor
-                                } else {
-                                    backGroundColor
-                                }
-                            )
-                            .border(
-                                width = .5.dp,
-                                color = if (isDay) {
-                                    selectedItemBackgroundColor
-                                } else {
-                                    Color.Transparent
-                                },
-//                            shape = MaterialTheme.shapes.medium
-                            )
-                            .clickable(onClick = {
-                                if (isDay) {
-                                    simpleDate = simpleDate.copy(day = day.toInt())
-                                }
-                            }),
-                    ) {
-                        Text(
-                            modifier = Modifier
-                                .padding(4.dp)
-                                .align(dayAlign),
-                            text = day,
-                            fontFamily = fontFamily,
-                            style = textStyle,
-                            color = if (isCurrentDay) {
-                                selectedTextColor
-                            } else {
-                                textColor
-                            },
+            IconButton(
+                onClick = {
+                    if (initialDate.month == simpleDate.month && initialDate.year == simpleDate.year) return@IconButton
+                    simpleDate = if (simpleDate.month == 1) {
+                        simpleDate.copy(
+                            month = 12,
+                            year = simpleDate.year - 1
+                        )
+                    } else {
+                        simpleDate.copy(
+                            month = simpleDate.month - 1,
                         )
                     }
+                }
+            ) {
+                Icon(
+                    imageVector = Icons.AutoMirrored.Default.KeyboardArrowLeft,
+                    contentDescription = null
+                )
+            }
+
+            Text(
+                modifier = Modifier
+                    .weight(1f),
+                text = simpleDate.year.toString().formatToHindiIfLanguageIsFa(),
+                textAlign = TextAlign.Center,
+                fontFamily = fontFamily,
+                style = textStyle.copy(
+                    fontSize = 24.sp
+                )
+            )
+            Spacer(modifier = Modifier.weight(1f))
+            Text(
+                modifier = Modifier
+                    .weight(1f),
+                text = simpleDate.month.asStringMonthName(),
+                textAlign = TextAlign.Center,
+                fontFamily = fontFamily,
+                style = textStyle.copy(
+                    fontSize = 24.sp
+                )
+            )
+            Text(
+                modifier = Modifier
+                    .weight(1f),
+                text = simpleDate.day.padZeroToStartWithPersianDigits(),
+                textAlign = TextAlign.Center,
+                fontFamily = fontFamily,
+                style = textStyle.copy(
+                    fontSize = 24.sp
+                )
+            )
+            IconButton(
+                onClick = {
+                    simpleDate = if (simpleDate.month == 12) {
+                        simpleDate.copy(
+                            month = 1,
+                            year = simpleDate.year + 1
+                        )
+                    } else {
+                        simpleDate.copy(
+                            month = simpleDate.month + 1,
+                        )
+                    }
+                }
+            ) {
+                Icon(
+                    imageVector = Icons.AutoMirrored.Default.KeyboardArrowRight,
+                    contentDescription = null
+                )
+            }
+        }
+
+        // Weekday headers
+        Row(
+            modifier = Modifier.fillMaxWidth(),
+            horizontalArrangement = Arrangement.SpaceAround,
+            verticalAlignment = Alignment.CenterVertically
+        ) {
+            DatePickerUtils.weekDays().forEach { weekDay ->
+                Text(
+                    modifier = Modifier
+                        .weight(1f)
+                        .background(selectedItemBackgroundColor)
+                        .padding(vertical = 4.dp),
+                    text = weekDay.take(3).uppercase(),
+                    textAlign = TextAlign.Center,
+                    fontFamily = fontFamily,
+                    style = textStyle
+                )
+            }
+        }
+
+        // Calendar days
+        FlowRow(
+            modifier = Modifier.fillMaxWidth(),
+            horizontalArrangement = Arrangement.SpaceAround,
+            itemVerticalAlignment = Alignment.CenterVertically,
+            maxItemsInEachRow = 7
+        ) {
+            daysList.value.forEach { day ->
+                val isDay = day.isNotBlank()
+                val isCurrentDay = isDay && day.toInt() == simpleDate.day
+                Box(
+                    modifier = Modifier
+                        .weight(1f)
+                        .aspectRatio(1f)
+                        .background(
+                            if (isCurrentDay) {
+                                selectedItemBackgroundColor
+                            } else {
+                                backGroundColor
+                            }
+                        )
+                        .border(
+                            width = .5.dp,
+                            color = if (isDay) {
+                                selectedItemBackgroundColor
+                            } else {
+                                Color.Transparent
+                            },
+//                            shape = MaterialTheme.shapes.medium
+                        )
+                        .clickable(onClick = {
+                            if (isDay) {
+                                simpleDate = simpleDate.copy(day = day.toInt())
+                            }
+                        }),
+                ) {
+                    Text(
+                        modifier = Modifier
+                            .padding(4.dp)
+                            .align(dayAlign),
+                        text = day,
+                        fontFamily = fontFamily,
+                        style = textStyle,
+                        color = if (isCurrentDay) {
+                            selectedTextColor
+                        } else {
+                            textColor
+                        },
+                    )
                 }
             }
         }
