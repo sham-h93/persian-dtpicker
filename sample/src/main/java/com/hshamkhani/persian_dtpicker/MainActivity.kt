@@ -48,30 +48,29 @@ class MainActivity : ComponentActivity() {
 fun SamplePersianCalendar(
     modifier: Modifier = Modifier,
 ) {
-    val context = LocalContext.current
-    var selectedDate by remember { mutableStateOf(SimpleDate.now(context = context)) }
-
-    Box(
+    Column(
         modifier = modifier,
-        contentAlignment = Alignment.Center
     ) {
         PersianCalendar(
-            modifier = Modifier.fillMaxWidth(),
+            onDateSelected = { simpleDate ->
+
+            }
+        )
+
+        PersianCalendar(
+            modifier = Modifier.fillMaxWidth().weight(1f),
             dayAlign = Alignment.TopStart,
             textStyle = MaterialTheme.typography.titleMedium,
             textColor = MaterialTheme.colorScheme.onBackground,
-            selectedTextColor = MaterialTheme.colorScheme.onBackground,
             backGroundColor = MaterialTheme.colorScheme.background,
-            selectedItemBackgroundColor = MaterialTheme.colorScheme.primaryContainer,
+            selectedItemBorderColor = MaterialTheme.colorScheme.primaryContainer,
             dayContent = { day, isSelected ->
                 if (isSelected) Text(
                     modifier = Modifier.align(Alignment.Center),
                     text = "+"
                 )
             },
-            selectedDate = selectedDate,
             onDateSelected = { simpleDate ->
-                selectedDate = simpleDate
             }
         )
     }

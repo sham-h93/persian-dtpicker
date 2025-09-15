@@ -8,6 +8,7 @@ import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.BoxScope
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.FlowRow
+import androidx.compose.foundation.layout.FlowRowScope
 import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.Spacer
 import androidx.compose.foundation.layout.aspectRatio
@@ -32,7 +33,6 @@ import androidx.compose.ui.draw.clip
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.text.TextStyle
-import androidx.compose.ui.text.font.FontFamily
 import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.text.style.TextOverflow
 import androidx.compose.ui.unit.dp
@@ -48,14 +48,58 @@ import com.hshamkhani.persiandtpicker.utils.SimpleDate
 @Composable
 fun PersianCalendar(
     modifier: Modifier = Modifier,
+    textStyle: TextStyle = MaterialTheme.typography.bodyLarge,
+    textColor: Color = MaterialTheme.colorScheme.onSurface,
+    backGroundColor: Color = MaterialTheme.colorScheme.background,
+    selectedItemBackgroundColor: Color = MaterialTheme.colorScheme.primaryContainer,
+    selectedDate: SimpleDate? = null,
+    onDateSelected: (date: SimpleDate) -> Unit,
+) {
+    PersianCalendarImpl(
+        modifier = modifier,
+        textStyle = textStyle,
+        textColor = textColor,
+        backGroundColor = backGroundColor,
+        selectedItemBackgroundColor = selectedItemBackgroundColor,
+        selectedDate = selectedDate,
+        onDateSelected = onDateSelected,
+    )
+}
+
+@Composable
+fun PersianCalendar(
+    modifier: Modifier = Modifier,
     dayAlign: Alignment = Alignment.Center,
     textStyle: TextStyle = MaterialTheme.typography.bodyLarge,
-    fontFamily: FontFamily = FontFamily.Default,
     textColor: Color = MaterialTheme.colorScheme.onSurface,
-    selectedTextColor: Color = MaterialTheme.colorScheme.primary,
+    backGroundColor: Color = MaterialTheme.colorScheme.background,
+    selectedItemBorderColor: Color = MaterialTheme.colorScheme.surfaceContainerLowest,
+    dayContent: @Composable BoxScope.(String, Boolean) -> Unit,
+    selectedDate: SimpleDate? = null,
+    onDateSelected: (date: SimpleDate) -> Unit,
+) {
+    PersianCalendarImpl(
+        modifier = modifier,
+        dayAlign = dayAlign,
+        textStyle = textStyle,
+        textColor = textColor,
+        backGroundColor = backGroundColor,
+        selectedItemBackgroundColor = selectedItemBorderColor,
+        dayContent = dayContent,
+        selectedDate = selectedDate,
+        onDateSelected = onDateSelected,
+    )
+}
+
+@Composable
+private fun PersianCalendarImpl(
+    modifier: Modifier = Modifier,
+    dayAlign: Alignment = Alignment.Center,
+    textStyle: TextStyle = MaterialTheme.typography.bodyLarge,
+    textColor: Color = MaterialTheme.colorScheme.onSurface,
     backGroundColor: Color = MaterialTheme.colorScheme.background,
     selectedItemBackgroundColor: Color = MaterialTheme.colorScheme.surfaceContainerLowest,
-    dayContent: @Composable BoxScope.(String, Boolean) -> Unit = { day, isSelected -> },
+    dayContent: (@Composable BoxScope.(String, Boolean) -> Unit)? = null,
     selectedDate: SimpleDate? = null,
     onDateSelected: (date: SimpleDate) -> Unit,
 ) {
@@ -124,7 +168,6 @@ fun PersianCalendar(
                     .weight(1f),
                 text = simpleDate.year.toString().formatToHindiIfLanguageIsFa(),
                 textAlign = TextAlign.Center,
-                fontFamily = fontFamily,
                 style = textStyle.copy(
                     fontSize = 24.sp
                 )
@@ -135,7 +178,6 @@ fun PersianCalendar(
                     .weight(1f),
                 text = simpleDate.month.asStringMonthName(),
                 textAlign = TextAlign.Center,
-                fontFamily = fontFamily,
                 style = textStyle.copy(
                     fontSize = 24.sp
                 )
@@ -145,7 +187,6 @@ fun PersianCalendar(
                     .weight(1f),
                 text = simpleDate.day.padZeroToStartWithPersianDigits(),
                 textAlign = TextAlign.Center,
-                fontFamily = fontFamily,
                 style = textStyle.copy(
                     fontSize = 24.sp
                 )
@@ -183,7 +224,6 @@ fun PersianCalendar(
                     maxLines = 1,
                     overflow = TextOverflow.Clip,
                     textAlign = TextAlign.Center,
-                    fontFamily = fontFamily,
                     style = MaterialTheme.typography.bodyLarge
                 )
             }
@@ -200,47 +240,108 @@ fun PersianCalendar(
             daysList.value.forEach { day ->
                 val isDay = day.isNotBlank()
                 val isCurrentDay = isDay && day.toInt() == simpleDate.day
-                Box(
-                    modifier = Modifier
-                        .weight(1f)
-                        .aspectRatio(1f)
-                        .background(
-                            if (isCurrentDay) {
-                                Color.Transparent
-                            } else {
-                                backGroundColor
-                            }
-                        )
-                        .border(
-                            width = 1.dp,
-                            color = if (isCurrentDay) {
-                                selectedItemBackgroundColor
-                            } else {
-                                Color.Transparent
-                            },
-                        )
-                        .clickable(onClick = {
-                            if (isDay) {
-                                simpleDate = simpleDate.copy(day = day.toInt())
-                            }
-                        }),
-                ) {
-                    dayContent(day, isCurrentDay)
-                    Text(
-                        modifier = Modifier
-                            .align(dayAlign)
-                            .padding(4.dp),
-                        text = day,
-                        fontFamily = fontFamily,
-                        style = textStyle,
-                        color = if (isCurrentDay) {
-                            selectedTextColor
-                        } else {
-                            textColor
-                        },
+
+                // Day Filler
+                if (!isDay) {
+                    Box(
+                        modifier = modifier
+                            .weight(1f)
+                            .aspectRatio(1f)
+                    )
+                }
+
+                // Day with content
+                if (dayContent != null && isDay) {
+                    DayWitchContent(
+                        isCurrentDay = isCurrentDay,
+                        selectedBorderColor = selectedItemBackgroundColor,
+                        onClick = { simpleDate = simpleDate.copy(day = day.toInt()) },
+                        content = {
+                            dayContent(day, isCurrentDay)
+                            Text(
+                                modifier = Modifier
+                                    .align(dayAlign)
+                                    .padding(4.dp),
+                                text = day,
+                                style = textStyle,
+                                color = textColor,
+                            )
+                        }
+                    )
+                }
+
+                // Simple day
+                if (dayContent == null && isDay) {
+                    Day(
+                        isCurrentDay = isCurrentDay,
+                        backGroundColor = backGroundColor,
+                        selectedDaybackgroundColor = selectedItemBackgroundColor,
+                        onClick = { simpleDate = simpleDate.copy(day = day.toInt()) },
+                        content = {
+                            Text(
+                                modifier = Modifier
+                                    .align(Alignment.Center),
+                                text = day,
+                                style = textStyle,
+                                color = textColor,
+                            )
+                        }
                     )
                 }
             }
         }
     }
+}
+
+@Composable
+private fun FlowRowScope.DayWitchContent(
+    modifier: Modifier = Modifier,
+    isCurrentDay: Boolean,
+    selectedBorderColor: Color,
+    onClick: () -> Unit,
+    content: @Composable BoxScope.() -> Unit,
+) {
+    Box(
+        modifier = modifier
+            .weight(1f)
+            .aspectRatio(1f)
+            .background(selectedBorderColor.copy(alpha =  if (isCurrentDay).1f else 0f))
+            .border(
+                width = 1.dp,
+                color = if (isCurrentDay) {
+                    selectedBorderColor
+                } else {
+                    Color.Transparent
+                },
+            )
+            .clickable(onClick = onClick),
+        content = content
+    )
+}
+
+@Composable
+private fun FlowRowScope.Day(
+    modifier: Modifier = Modifier,
+    isCurrentDay: Boolean,
+    backGroundColor: Color,
+    selectedDaybackgroundColor: Color,
+    onClick: () -> Unit,
+    content: @Composable BoxScope.() -> Unit,
+) {
+    Box(
+        modifier = modifier
+            .weight(1f)
+            .aspectRatio(1f)
+            .padding(8.dp)
+            .clip(MaterialTheme.shapes.large)
+            .background(
+                if (isCurrentDay) {
+                    selectedDaybackgroundColor
+                } else {
+                    backGroundColor
+                }
+            )
+            .clickable(onClick = onClick),
+        content = content
+    )
 }
