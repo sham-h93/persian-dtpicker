@@ -1,11 +1,13 @@
 package com.hshamkhani.persiandtpicker.picker
 
 import androidx.compose.foundation.layout.Arrangement
+import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.Spacer
 import androidx.compose.foundation.layout.width
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.CompositionLocalProvider
 import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
@@ -14,9 +16,11 @@ import androidx.compose.runtime.setValue
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.platform.LocalContext
+import androidx.compose.ui.platform.LocalLayoutDirection
 import androidx.compose.ui.text.TextStyle
 import androidx.compose.ui.text.font.FontFamily
 import androidx.compose.ui.text.intl.Locale
+import androidx.compose.ui.unit.LayoutDirection
 import androidx.compose.ui.unit.dp
 import com.hshamkhani.persiandtpicker.components.WheelPicker
 import com.hshamkhani.persiandtpicker.utils.DatePickerUtils
@@ -81,71 +85,77 @@ fun PersianDatePicker(
         )
     }
 
-    Row(
-        modifier = modifier,
-        horizontalArrangement = Arrangement.spacedBy(4.dp)
-    ) {
-        if (withTimePicker) {
-            TimePicker(
-                modifier = Modifier,
-                textStyle = textStyle,
+    CompositionLocalProvider(LocalLayoutDirection provides LayoutDirection.Ltr) {
+        Row(
+            modifier = modifier,
+            horizontalArrangement = Arrangement.spacedBy(4.dp)
+        ) {
+            WheelPicker(
+                options = years,
                 fontFamily = fontFamily,
+                textStyle = textStyle,
                 textColor = textColor,
                 selectedTextColor = selectedTextColor,
                 backGroundColor = backGroundColor,
                 selectedItemBackgroundColor = selectedItemBackgroundColor,
-            ) { time ->
-                simpleDate = simpleDate.copy(
-                    time = time
-                )
-            }
-            Spacer(Modifier.width(8.dp))
-        }
+                onValueSelected = { index, value ->
+                    simpleDate = simpleDate.copy(
+                        year = value.toInt()
+                    )
+                }
+            )
 
-        WheelPicker(
-            modifier = Modifier,
-            options = days,
-            initialValueIndex = initialDate.day - 1,
-            fontFamily = fontFamily,
-            textStyle = textStyle,
-            textColor = textColor,
-            selectedTextColor = selectedTextColor,
-            backGroundColor = backGroundColor,
-            selectedItemBackgroundColor = selectedItemBackgroundColor,
-            onValueSelected = { index, value ->
-                simpleDate = simpleDate.copy(
-                    day = value.toInt(),
-                )
+            WheelPicker(
+                options = months,
+                initialValueIndex = initialDate.month - 1,
+                fontFamily = fontFamily,
+                textStyle = textStyle,
+                textColor = textColor,
+                selectedTextColor = selectedTextColor,
+                backGroundColor = backGroundColor,
+                selectedItemBackgroundColor = selectedItemBackgroundColor,
+                onValueSelected = { index, _ ->
+                    simpleDate = simpleDate.copy(
+                        month = index + 1 // month is 1-based,
+                    )
+                }
+            )
+
+            WheelPicker(
+                modifier = Modifier,
+                options = days,
+                initialValueIndex = initialDate.day - 1,
+                fontFamily = fontFamily,
+                textStyle = textStyle,
+                textColor = textColor,
+                selectedTextColor = selectedTextColor,
+                backGroundColor = backGroundColor,
+                selectedItemBackgroundColor = selectedItemBackgroundColor,
+                onValueSelected = { index, value ->
+                    simpleDate = simpleDate.copy(
+                        day = value.toInt(),
+                    )
+                }
+            )
+
+
+            if (withTimePicker) {
+                TimePicker(
+                    modifier = Modifier,
+                    textStyle = textStyle,
+                    fontFamily = fontFamily,
+                    textColor = textColor,
+                    selectedTextColor = selectedTextColor,
+                    backGroundColor = backGroundColor,
+                    selectedItemBackgroundColor = selectedItemBackgroundColor,
+                ) { time ->
+                    simpleDate = simpleDate.copy(
+                        time = time
+                    )
+                }
+                Spacer(Modifier.width(8.dp))
             }
-        )
-        WheelPicker(
-            options = months,
-            initialValueIndex = initialDate.month - 1,
-            fontFamily = fontFamily,
-            textStyle = textStyle,
-            textColor = textColor,
-            selectedTextColor = selectedTextColor,
-            backGroundColor = backGroundColor,
-            selectedItemBackgroundColor = selectedItemBackgroundColor,
-            onValueSelected = { index, _ ->
-                simpleDate = simpleDate.copy(
-                    month = index + 1 // month is 1-based,
-                )
-            }
-        )
-        WheelPicker(
-            options = years,
-            fontFamily = fontFamily,
-            textStyle = textStyle,
-            textColor = textColor,
-            selectedTextColor = selectedTextColor,
-            backGroundColor = backGroundColor,
-            selectedItemBackgroundColor = selectedItemBackgroundColor,
-            onValueSelected = { index, value ->
-                simpleDate = simpleDate.copy(
-                    year = value.toInt()
-                )
-            }
-        )
+
+        }
     }
 }

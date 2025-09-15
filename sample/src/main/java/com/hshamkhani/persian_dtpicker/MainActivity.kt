@@ -37,7 +37,8 @@ class MainActivity : ComponentActivity() {
         setContent {
             PersiandtpickerTheme {
                 Scaffold(modifier = Modifier.fillMaxSize()) { innerPadding ->
-                    SamplePersianCalendar(modifier = Modifier.padding(innerPadding))
+//                    SamplePersianCalendar(modifier = Modifier.padding(innerPadding))
+                    SamplePersianDatePicker()
                 }
             }
         }
@@ -79,8 +80,8 @@ fun SamplePersianCalendar(
 @Composable
 fun SamplePersianDatePicker(
     modifier: Modifier = Modifier,
-    context: Context
 ) {
+    val context = LocalContext.current
     var selectedDate by remember { mutableStateOf(SimpleDate(0, 0, 0)) }
     Column(
         modifier = Modifier.fillMaxSize(),

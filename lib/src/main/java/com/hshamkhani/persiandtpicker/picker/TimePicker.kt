@@ -8,6 +8,7 @@ import androidx.compose.foundation.layout.wrapContentSize
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.CompositionLocalProvider
 import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
@@ -17,9 +18,11 @@ import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.platform.LocalContext
+import androidx.compose.ui.platform.LocalLayoutDirection
 import androidx.compose.ui.text.TextStyle
 import androidx.compose.ui.text.font.FontFamily
 import androidx.compose.ui.text.intl.Locale
+import androidx.compose.ui.unit.LayoutDirection
 import androidx.compose.ui.unit.dp
 import com.hshamkhani.persiandtpicker.components.WheelPicker
 import com.hshamkhani.persiandtpicker.utils.ClockPeriod
@@ -104,71 +107,73 @@ fun TimePicker(
     LaunchedEffect(simpleTime) {
         onTimeChanged(simpleTime)
     }
-    Row(
-        modifier = modifier.wrapContentSize(),
-        verticalAlignment = Alignment.CenterVertically
-    ) {
-        WheelPicker(
-            modifier = Modifier,
-            options = minutes,
-            initialValueIndex = now.minute,
-            fontFamily = fontFamily,
-            textStyle = textStyle,
-            textColor = textColor,
-            selectedTextColor = selectedTextColor,
-            backGroundColor = backGroundColor,
-            selectedItemBackgroundColor = selectedItemBackgroundColor,
-            onValueSelected = { insex, _ ->
-                simpleTime = simpleTime.copy(
-                    minute = insex
-                )
-            }
-        )
-
-        Text(
-            text = ":",
-            style = textStyle,
-            color = MaterialTheme.colorScheme.primary
-        )
-
-        WheelPicker(
-            modifier = Modifier,
-            options = hours,
-            initialValueIndex = if (is24Hour) now.hour else if (now.hour == 0 || now.hour == 12) 11 else (now.hour % 12) - 1,
-            fontFamily = fontFamily,
-            textStyle = textStyle,
-            textColor = textColor,
-            selectedTextColor = selectedTextColor,
-            backGroundColor = backGroundColor,
-            selectedItemBackgroundColor = selectedItemBackgroundColor,
-            onValueSelected = { index, value ->
-                simpleTime = simpleTime.copy(
-                    hour = value.toInt(),
-                    clockPeriod = if (is24Hour) null else {
-                        if (value.toInt() < 12) ClockPeriod.Am else ClockPeriod.Pm
-                    }
-                )
-            }
-        )
-
-        if (!is24Hour) {
-            Spacer(Modifier.width(4.dp))
+    CompositionLocalProvider(LocalLayoutDirection provides LayoutDirection.Ltr) {
+        Row(
+            modifier = modifier.wrapContentSize(),
+            verticalAlignment = Alignment.CenterVertically
+        ) {
             WheelPicker(
                 modifier = Modifier,
-                options = amPm.toList(),
-                initialValueIndex = if (simpleTime.clockPeriod == ClockPeriod.Am) 0 else 1,
+                options = hours,
+                initialValueIndex = if (is24Hour) now.hour else if (now.hour == 0 || now.hour == 12) 11 else (now.hour % 12) - 1,
                 fontFamily = fontFamily,
                 textStyle = textStyle,
                 textColor = textColor,
                 selectedTextColor = selectedTextColor,
                 backGroundColor = backGroundColor,
                 selectedItemBackgroundColor = selectedItemBackgroundColor,
-                onValueSelected = { index, _ ->
+                onValueSelected = { index, value ->
                     simpleTime = simpleTime.copy(
-                        clockPeriod = if (index == 0) ClockPeriod.Am else ClockPeriod.Pm
+                        hour = value.toInt(),
+                        clockPeriod = if (is24Hour) null else {
+                            if (value.toInt() < 12) ClockPeriod.Am else ClockPeriod.Pm
+                        }
                     )
                 }
             )
+
+            Text(
+                text = ":",
+                style = textStyle,
+                color = MaterialTheme.colorScheme.primary
+            )
+
+            WheelPicker(
+                modifier = Modifier,
+                options = minutes,
+                initialValueIndex = now.minute,
+                fontFamily = fontFamily,
+                textStyle = textStyle,
+                textColor = textColor,
+                selectedTextColor = selectedTextColor,
+                backGroundColor = backGroundColor,
+                selectedItemBackgroundColor = selectedItemBackgroundColor,
+                onValueSelected = { insex, _ ->
+                    simpleTime = simpleTime.copy(
+                        minute = insex
+                    )
+                }
+            )
+
+            if (!is24Hour) {
+                Spacer(Modifier.width(4.dp))
+                WheelPicker(
+                    modifier = Modifier,
+                    options = amPm.toList(),
+                    initialValueIndex = if (simpleTime.clockPeriod == ClockPeriod.Am) 0 else 1,
+                    fontFamily = fontFamily,
+                    textStyle = textStyle,
+                    textColor = textColor,
+                    selectedTextColor = selectedTextColor,
+                    backGroundColor = backGroundColor,
+                    selectedItemBackgroundColor = selectedItemBackgroundColor,
+                    onValueSelected = { index, _ ->
+                        simpleTime = simpleTime.copy(
+                            clockPeriod = if (index == 0) ClockPeriod.Am else ClockPeriod.Pm
+                        )
+                    }
+                )
+            }
         }
     }
 }
