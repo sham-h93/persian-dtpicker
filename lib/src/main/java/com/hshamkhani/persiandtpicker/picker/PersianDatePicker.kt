@@ -1,7 +1,6 @@
 package com.hshamkhani.persiandtpicker.picker
 
 import androidx.compose.foundation.layout.Arrangement
-import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.Spacer
 import androidx.compose.foundation.layout.width
@@ -23,9 +22,12 @@ import androidx.compose.ui.text.intl.Locale
 import androidx.compose.ui.unit.LayoutDirection
 import androidx.compose.ui.unit.dp
 import com.hshamkhani.persiandtpicker.components.WheelPicker
-import com.hshamkhani.persiandtpicker.utils.DatePickerUtils
 import com.hshamkhani.persiandtpicker.utils.PersianNumberUtils.formatToHindiIfLanguageIsFa
 import com.hshamkhani.persiandtpicker.utils.SimpleDate
+import com.hshamkhani.persiandtpicker.utils.initDaysList
+import com.hshamkhani.persiandtpicker.utils.initMonthDays
+import com.hshamkhani.persiandtpicker.utils.initMonthList
+import com.hshamkhani.persiandtpicker.utils.initYearList
 
 /**
  * A composable function that displays a Persian date picker with options
@@ -67,21 +69,21 @@ fun PersianDatePicker(
 
     val years by remember {
         mutableStateOf(
-            DatePickerUtils.initYearList(initialDate.year)
+            initYearList(initialDate.year)
                 .map { it.toString().formatToHindiIfLanguageIsFa() })
     }
 
     val months by remember {
         mutableStateOf(
-            DatePickerUtils.initMonthList(isEng = isEng)
+            initMonthList(isEng = isEng)
         )
     }
 
     val days by remember(simpleDate.month) {
         val monthLength =
-            DatePickerUtils.initMonthDays(simpleDate.month, simpleDate.year).size
+            initMonthDays(simpleDate.month, simpleDate.year).size
         mutableStateOf(
-            DatePickerUtils.initDaysList(monthLength).map { it }
+            initDaysList(monthLength).map { it }
         )
     }
 

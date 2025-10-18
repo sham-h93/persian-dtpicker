@@ -2,7 +2,7 @@ package com.hshamkhani.persiandtpicker.utils
 
 import android.content.Context
 import android.text.format.DateFormat
-import com.hshamkhani.persiandtpicker.utils.DatePickerUtils.gregorianToJalali
+import com.hshamkhani.persiandtpicker.utils.gregorianToJalali
 import java.time.Instant
 import java.time.LocalDateTime
 import java.time.LocalTime
@@ -31,7 +31,7 @@ data class SimpleDate(
          * Represents current jalali date and time as a `SimpleDate` object.
          * */
         fun now(context: Context): SimpleDate {
-            val date = DatePickerUtils.currentJalaliDate()
+            val date = currentJalaliDate()
             val dateTime = LocalDateTime.now(ZoneId.systemDefault())
             val is24Hour = DateFormat.is24HourFormat(context)
 
@@ -137,7 +137,7 @@ data class SimpleTime(
  * @return A SimpleDate object representing the Gregorian date.
  * */
 fun SimpleDate.totGregorianDate(): SimpleDate {
-    val (year, month, day) = DatePickerUtils.jalaliToGregorian(
+    val (year, month, day) = jalaliToGregorian(
         jy = year,
         jm = month,
         jd = day
@@ -158,7 +158,8 @@ fun SimpleDate.totGregorianDate(): SimpleDate {
  * */
 
 fun SimpleDate.toCalendar(): Calendar {
-    val calendar = Calendar.getInstance().apply {
+    val calendar = Calendar.Builder().setCalendarType("gregorian").build()
+    calendar.apply {
         set(Calendar.YEAR, year)
         set(Calendar.MONTH, month - 1) // Calendar months are 0-based
         set(Calendar.DAY_OF_MONTH, day)

@@ -1,13 +1,14 @@
 package com.hshamkhani.persiandtpicker.utils
 
 import android.icu.util.Calendar
+import android.util.Log
 import com.hshamkhani.persiandtpicker.utils.PersianNumberUtils.padZeroToStartWithPersianDigits
+import kotlinx.collections.immutable.ImmutableList
+import kotlinx.collections.immutable.toImmutableList
 import java.time.LocalDate
 import java.time.LocalTime
 import java.time.ZoneId
 import java.util.Locale
-
-internal object DatePickerUtils {
 
     private val englishWeekDays = listOf(
         "Saturday",
@@ -62,8 +63,8 @@ internal object DatePickerUtils {
     fun weekDays() = if (Locale.getDefault().language == "fa") persianWeekDays else englishWeekDays
 
     fun SimpleDate.dayOfWeek(): Int {
-        val day = totGregorianDate().toCalendar().get(Calendar.DAY_OF_WEEK)
-        return when (day) {
+        val calendar = totGregorianDate().toCalendar()
+        return when (calendar.get(Calendar.DAY_OF_WEEK)) {
             Calendar.SATURDAY -> 1
             Calendar.SUNDAY -> 2
             Calendar.MONDAY -> 2
@@ -71,7 +72,7 @@ internal object DatePickerUtils {
             Calendar.WEDNESDAY -> 5
             Calendar.THURSDAY -> 6
             Calendar.FRIDAY -> 7
-            else -> 0
+            else -> 1
         }
     }
 
@@ -176,18 +177,19 @@ internal object DatePickerUtils {
      * Returns a list of integers representing the days in a month
      * */
 
-    fun initMonthDays(monthNumber: Int, year: Int): List<Int> {
+    fun initMonthDays(monthNumber: Int, year: Int): ImmutableList<Int> {
         val days29 = (1..29).map { it }
         val days30 = (1..30).map { it }
         val days31 = (1..31).map { it }
 
-        return when (monthNumber) {
+         val days = when (monthNumber) {
             in 1..6 -> days31
             in 7..11 -> days30
             12 -> if (year.isLeap()) days30 else days29
             else -> emptyList()
         }
 
+        return days.toImmutableList()
     }
 
     fun gregorianToJalali(gy: Int, gm: Int, gd: Int): IntArray {
@@ -258,4 +260,21 @@ internal object DatePickerUtils {
     }
 
 
+fun main() {
+    val jdt = gregorianToJalali(
+        gy = 2025,
+        gm = 10,
+        gd = 18
+    )
+    val gdt = jalaliToGregorian(
+        jy = 1404,
+        jm = 7,
+        jd = 26
+    )
+    gdt.forEach {
+        println(it)
+    }
+    jdt.forEach {
+        println(it)
+    }
 }

@@ -29,6 +29,8 @@ import com.hshamkhani.persiandtpicker.picker.PersianDatePicker
 import com.hshamkhani.persiandtpicker.picker.TimePicker
 import com.hshamkhani.persiandtpicker.utils.SimpleDate
 import com.hshamkhani.persiandtpicker.utils.SimpleTime
+import com.hshamkhani.persiandtpicker.utils.toCalendar
+import com.hshamkhani.persiandtpicker.utils.totGregorianDate
 
 class MainActivity : ComponentActivity() {
     override fun onCreate(savedInstanceState: Bundle?) {
@@ -37,8 +39,8 @@ class MainActivity : ComponentActivity() {
         setContent {
             PersiandtpickerTheme {
                 Scaffold(modifier = Modifier.fillMaxSize()) { innerPadding ->
-//                    SamplePersianCalendar(modifier = Modifier.padding(innerPadding))
-                    SamplePersianDatePicker()
+                    SamplePersianCalendar(modifier = Modifier.padding(innerPadding))
+//                    SamplePersianDatePicker()
                 }
             }
         }
@@ -58,7 +60,7 @@ fun SamplePersianCalendar(
             }
         )
 
-        PersianCalendar(
+/*        PersianCalendar(
             modifier = Modifier.fillMaxWidth().weight(1f),
             dayAlign = Alignment.TopStart,
             textStyle = MaterialTheme.typography.titleMedium,
@@ -73,7 +75,7 @@ fun SamplePersianCalendar(
             },
             onDateSelected = { simpleDate ->
             }
-        )
+        )*/
     }
 }
 
@@ -82,9 +84,9 @@ fun SamplePersianDatePicker(
     modifier: Modifier = Modifier,
 ) {
     val context = LocalContext.current
-    var selectedDate by remember { mutableStateOf(SimpleDate(0, 0, 0)) }
+    var selectedDate by remember { mutableStateOf(SimpleDate.now(context)) }
     Column(
-        modifier = Modifier.fillMaxSize(),
+        modifier = modifier.fillMaxSize(),
         horizontalAlignment = Alignment.CenterHorizontally,
         verticalArrangement = Arrangement.spacedBy(8.dp, Alignment.CenterVertically)
     ) {
@@ -92,7 +94,21 @@ fun SamplePersianDatePicker(
             modifier = Modifier
                 .padding(16.dp),
             style = MaterialTheme.typography.titleLarge,
-            text = "$selectedDate"
+            text = selectedDate.toString()
+        )
+
+        Text(
+            modifier = Modifier
+                .padding(16.dp),
+            style = MaterialTheme.typography.titleLarge,
+            text = selectedDate.totGregorianDate().toString()
+        )
+
+        Text(
+            modifier = Modifier
+                .padding(16.dp),
+            style = MaterialTheme.typography.titleLarge,
+            text = selectedDate.totGregorianDate().toCalendar().time.toString()
         )
 
         PersianDatePicker(

@@ -43,6 +43,7 @@ dependencies {
     implementation(libs.androidx.ui)
     implementation(libs.jalali.calendar)
     implementation(libs.kotlinx.datetime)
+    implementation(libs.kotlinx.collections.immutable)
 }
 
 publishing {

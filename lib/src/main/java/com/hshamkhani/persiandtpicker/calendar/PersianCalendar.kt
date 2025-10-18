@@ -1,5 +1,6 @@
 package com.hshamkhani.persiandtpicker.calendar
 
+import android.util.Log
 import androidx.compose.foundation.background
 import androidx.compose.foundation.border
 import androidx.compose.foundation.clickable
@@ -14,16 +15,12 @@ import androidx.compose.foundation.layout.Spacer
 import androidx.compose.foundation.layout.aspectRatio
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.padding
-import androidx.compose.material.icons.Icons
-import androidx.compose.material.icons.automirrored.filled.KeyboardArrowLeft
-import androidx.compose.material.icons.automirrored.filled.KeyboardArrowRight
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.derivedStateOf
 import androidx.compose.runtime.getValue
-import androidx.compose.runtime.mutableIntStateOf
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
 import androidx.compose.runtime.setValue
@@ -31,19 +28,24 @@ import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
 import androidx.compose.ui.graphics.Color
+import androidx.compose.ui.graphics.vector.ImageVector
 import androidx.compose.ui.platform.LocalContext
+import androidx.compose.ui.res.vectorResource
 import androidx.compose.ui.text.TextStyle
 import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.text.style.TextOverflow
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
+import com.hshamkhani.persiandtpicker.R
 import com.hshamkhani.persiandtpicker.components.FlatIconButton
-import com.hshamkhani.persiandtpicker.utils.DatePickerUtils
-import com.hshamkhani.persiandtpicker.utils.DatePickerUtils.dayOfWeek
 import com.hshamkhani.persiandtpicker.utils.PersianNumberUtils.asStringMonthName
 import com.hshamkhani.persiandtpicker.utils.PersianNumberUtils.formatToHindiIfLanguageIsFa
 import com.hshamkhani.persiandtpicker.utils.PersianNumberUtils.padZeroToStartWithPersianDigits
 import com.hshamkhani.persiandtpicker.utils.SimpleDate
+import com.hshamkhani.persiandtpicker.utils.SimpleTime
+import com.hshamkhani.persiandtpicker.utils.dayOfWeek
+import com.hshamkhani.persiandtpicker.utils.initMonthDays
+import com.hshamkhani.persiandtpicker.utils.weekDays
 
 @Composable
 fun PersianCalendar(
@@ -109,20 +111,21 @@ private fun PersianCalendarImpl(
     var simpleDate by remember { mutableStateOf(selectedDate ?: initialDate) }
 
     val daysInMonth by remember(simpleDate.month) {
-        mutableIntStateOf(
-            DatePickerUtils.initMonthDays(
+        mutableStateOf(
+            initMonthDays(
                 monthNumber = simpleDate.month,
                 year = simpleDate.year
-            ).size
+            )
         )
     }
 
     val daysList = remember(daysInMonth) {
         derivedStateOf {
+            simpleDate = simpleDate.copy(time = SimpleTime())
             val start = simpleDate.copy(day = 1).dayOfWeek() - 1
-            val end = 7 - simpleDate.copy(day = daysInMonth).dayOfWeek()
+            val end = 7 - simpleDate.copy(day = daysInMonth.last()).dayOfWeek() + 1
 
-            val monthDays = (1..daysInMonth).map {
+            val monthDays = (1..daysInMonth.last()).map {
                 it.toString().formatToHindiIfLanguageIsFa()
             }
             val padStart = List(start) { "" }
@@ -147,7 +150,7 @@ private fun PersianCalendarImpl(
             verticalAlignment = Alignment.CenterVertically
         ) {
             FlatIconButton(
-                icon = Icons.AutoMirrored.Default.KeyboardArrowLeft,
+                icon = ImageVector.vectorResource(id = R.drawable.keyboard_arrow_left),
                 onClick = {
                     if (initialDate.month == simpleDate.month && initialDate.year == simpleDate.year) return@FlatIconButton
                     simpleDate = if (simpleDate.month == 1) {
@@ -192,7 +195,7 @@ private fun PersianCalendarImpl(
                 )
             )
             FlatIconButton(
-                icon = Icons.AutoMirrored.Default.KeyboardArrowRight,
+                icon = ImageVector.vectorResource(id = R.drawable.keyboard_arrow_right),
                 onClick = {
                     simpleDate = if (simpleDate.month == 12) {
                         simpleDate.copy(
@@ -214,7 +217,7 @@ private fun PersianCalendarImpl(
             horizontalArrangement = Arrangement.SpaceAround,
             verticalAlignment = Alignment.CenterVertically
         ) {
-            DatePickerUtils.weekDays().forEach { weekDay ->
+            weekDays().forEach { weekDay ->
                 Text(
                     modifier = Modifier
                         .weight(1f)
@@ -235,7 +238,7 @@ private fun PersianCalendarImpl(
             horizontalArrangement = Arrangement.SpaceAround,
             itemVerticalAlignment = Alignment.CenterVertically,
             maxItemsInEachRow = 7,
-            maxLines = 5
+            maxLines = 6
         ) {
             daysList.value.forEach { day ->
                 val isDay = day.isNotBlank()
@@ -305,7 +308,7 @@ private fun FlowRowScope.DayWitchContent(
         modifier = modifier
             .weight(1f)
             .aspectRatio(1f)
-            .background(selectedBorderColor.copy(alpha =  if (isCurrentDay).1f else 0f))
+            .background(selectedBorderColor.copy(alpha = if (isCurrentDay) .1f else 0f))
             .border(
                 width = 1.dp,
                 color = if (isCurrentDay) {
