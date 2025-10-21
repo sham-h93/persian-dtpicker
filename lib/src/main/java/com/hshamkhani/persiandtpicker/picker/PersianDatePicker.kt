@@ -57,7 +57,6 @@ fun PersianDatePicker(
     onDateSelected: (date: SimpleDate) -> Unit,
 ) {
 
-    val isEng = Locale.current.language != "fa"
     val context = LocalContext.current
 
     val initialDate by remember { mutableStateOf(SimpleDate.now(context = context)) }
@@ -75,7 +74,7 @@ fun PersianDatePicker(
 
     val months by remember {
         mutableStateOf(
-            initMonthList(isEng = isEng)
+            initMonthList()
         )
     }
 
