@@ -67,7 +67,7 @@ fun SimpleDate.dayOfWeek(): Int {
     return when (calendar.get(Calendar.DAY_OF_WEEK)) {
         Calendar.SATURDAY -> 1
         Calendar.SUNDAY -> 2
-        Calendar.MONDAY -> 2
+        Calendar.MONDAY -> 3
         Calendar.TUESDAY -> 4
         Calendar.WEDNESDAY -> 5
         Calendar.THURSDAY -> 6
@@ -251,24 +251,4 @@ fun jalaliToGregorian(jy: Int, jm: Int, jd: Int): IntArray {
     var gm = 0
     while (gm < 13 && gd > sal_a[gm]) gd -= sal_a[gm++]
     return intArrayOf(gy, gm, gd)
-}
-
-
-fun main() {
-    val jdt = gregorianToJalali(
-        gy = 2025,
-        gm = 10,
-        gd = 18
-    )
-    val gdt = jalaliToGregorian(
-        jy = 1404,
-        jm = 7,
-        jd = 26
-    )
-    gdt.forEach {
-        println(it)
-    }
-    jdt.forEach {
-        println(it)
-    }
 }

@@ -1,6 +1,5 @@
 package com.hshamkhani.persiandtpicker.calendar
 
-import android.util.Log
 import androidx.compose.foundation.background
 import androidx.compose.foundation.border
 import androidx.compose.foundation.clickable
@@ -35,7 +34,6 @@ import androidx.compose.ui.text.TextStyle
 import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.text.style.TextOverflow
 import androidx.compose.ui.unit.dp
-import androidx.compose.ui.unit.sp
 import com.hshamkhani.persiandtpicker.R
 import com.hshamkhani.persiandtpicker.components.FlatIconButton
 import com.hshamkhani.persiandtpicker.utils.PersianNumberUtils.asStringMonthName
@@ -133,7 +131,7 @@ private fun PersianCalendarImpl(
 
             padStart + monthDays + padEnd
         }
-    }
+    }           
 
     LaunchedEffect(simpleDate) {
         onDateSelected(simpleDate)
@@ -171,28 +169,22 @@ private fun PersianCalendarImpl(
                     .weight(1f),
                 text = simpleDate.year.toString().formatToHindiIfLanguageIsFa(),
                 textAlign = TextAlign.Center,
-                style = textStyle.copy(
-                    fontSize = 24.sp
-                )
+                style = textStyle
             )
             Spacer(modifier = Modifier.weight(1f))
             Text(
                 modifier = Modifier
-                    .weight(1f),
+                    .weight(2f),
                 text = simpleDate.month.asStringMonthName(),
                 textAlign = TextAlign.Center,
-                style = textStyle.copy(
-                    fontSize = 24.sp
-                )
+                style = textStyle
             )
             Text(
                 modifier = Modifier
                     .weight(1f),
                 text = simpleDate.day.padZeroToStartWithPersianDigits(),
                 textAlign = TextAlign.Center,
-                style = textStyle.copy(
-                    fontSize = 24.sp
-                )
+                style = textStyle
             )
             FlatIconButton(
                 icon = ImageVector.vectorResource(id = R.drawable.keyboard_arrow_right),
@@ -227,7 +219,7 @@ private fun PersianCalendarImpl(
                     maxLines = 1,
                     overflow = TextOverflow.Clip,
                     textAlign = TextAlign.Center,
-                    style = MaterialTheme.typography.bodyLarge
+                    style = textStyle
                 )
             }
         }
