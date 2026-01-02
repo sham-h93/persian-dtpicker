@@ -1,45 +1,55 @@
 package com.hshamkhani.persiandtpicker.picker
 
+import androidx.compose.animation.animateBounds
+import androidx.compose.foundation.background
+import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.Arrangement
+import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
-import androidx.compose.foundation.layout.fillMaxWidth
+import androidx.compose.foundation.layout.PaddingValues
+import androidx.compose.foundation.layout.padding
+import androidx.compose.foundation.layout.widthIn
+import androidx.compose.foundation.layout.wrapContentSize
 import androidx.compose.foundation.lazy.LazyRow
-import androidx.compose.material3.Card
+import androidx.compose.foundation.lazy.rememberLazyListState
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.derivedStateOf
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
 import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.draw.clip
 import androidx.compose.ui.graphics.Color
+import androidx.compose.ui.layout.LookaheadScope
 import androidx.compose.ui.platform.LocalContext
+import androidx.compose.ui.text.PlatformTextStyle
 import androidx.compose.ui.text.TextStyle
-import androidx.compose.ui.text.font.FontFamily
+import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.dp
+import androidx.compose.ui.unit.sp
 import com.hshamkhani.persiandtpicker.utils.PersianNumberUtils.asStringMonthName
+import com.hshamkhani.persiandtpicker.utils.PersianNumberUtils.formatToHindiIfLanguageIsFa
 import com.hshamkhani.persiandtpicker.utils.SimpleDate
-import com.hshamkhani.persiandtpicker.utils.initMonthDays
-import com.hshamkhani.persiandtpicker.utils.initYearList
+import com.hshamkhani.persiandtpicker.utils.plusDays
 
 @Composable
 fun RailPicker(
     modifier: Modifier = Modifier,
-    textStyle: TextStyle = MaterialTheme.typography.headlineMedium,
-    fontFamily: FontFamily = FontFamily.Default,
+    textStyle: TextStyle = MaterialTheme.typography.titleLarge,
     textColor: Color = MaterialTheme.colorScheme.onSurface,
-    selectedTextColor: Color = MaterialTheme.colorScheme.primary,
-    backGroundColor: Color = MaterialTheme.colorScheme.background,
-    selectedItemBackgroundColor: Color = MaterialTheme.colorScheme.surfaceContainerLowest,
-    selectedDate: SimpleDate? = null,
+    selectedTextColor: Color = MaterialTheme.colorScheme.onPrimaryContainer,
+    backGroundColor: Color = MaterialTheme.colorScheme.surfaceContainer,
+    selectedItemBackgroundColor: Color = MaterialTheme.colorScheme.primaryContainer,
+    selectedDate: SimpleDate?,
     onDateSelected: (date: SimpleDate) -> Unit,
 ) {
     RailPickerImpl(
         modifier = modifier,
         textStyle = textStyle,
-        fontFamily = fontFamily,
         textColor = textColor,
         selectedTextColor = selectedTextColor,
         backGroundColor = backGroundColor,
@@ -53,60 +63,135 @@ fun RailPicker(
 private fun RailPickerImpl(
     modifier: Modifier = Modifier,
     textStyle: TextStyle = MaterialTheme.typography.headlineMedium,
-    fontFamily: FontFamily = FontFamily.Default,
     textColor: Color = MaterialTheme.colorScheme.onSurface,
     selectedTextColor: Color = MaterialTheme.colorScheme.primary,
     backGroundColor: Color = MaterialTheme.colorScheme.background,
     selectedItemBackgroundColor: Color = MaterialTheme.colorScheme.surfaceContainerLowest,
-    selectedDate: SimpleDate? = null,
-    onDateSelected: (date: SimpleDate) -> Unit
+    selectedDate: SimpleDate?,
+    onDateSelected: (SimpleDate) -> Unit
 ) {
     val context = LocalContext.current
-
-    val initialDate by remember { mutableStateOf(SimpleDate.now(context = context)) }
-    var simpleDate by remember { mutableStateOf(selectedDate ?: initialDate) }
-
-    val years by remember {
-        mutableStateOf(
-            initYearList(initialDate.year).map { year ->
-                (1..12).map { month ->
-                    initMonthDays(
-                        monthNumber = month,
-                        year = year
-                    ).map { it.asStringMonthName() }.toList()
-                }.flatten()
-            }
-        )
+    val initialDate = remember {
+        selectedDate ?: SimpleDate.now(context)
     }
 
-    LazyRow(
-        modifier = Modifier.fillMaxWidth(),
-        horizontalArrangement = Arrangement.spacedBy(8.dp)
-    ) {
-        years.forEach {
-            items(
-                count = it.size
-            ) { year ->
+    var currentSelectedDate by remember {
+        mutableStateOf(initialDate)
+    }
 
+    val listState = rememberLazyListState(
+        initialFirstVisibleItemIndex = RAIL_CENTER_INDEX
+    )
+
+    LazyRow(
+        modifier = modifier,
+        state = listState,
+        horizontalArrangement = Arrangement.spacedBy(8.dp),
+        contentPadding = PaddingValues(horizontal = 16.dp)
+    ) {
+        items(
+            count = Int.MAX_VALUE,
+            key = { it }
+        ) { index ->
+
+            val date = dateForIndex(initialDate, index)
+            val isSelected by remember {
+                derivedStateOf { date == currentSelectedDate }
             }
+
+            RailDateItem(
+                date = date,
+                isSelected = isSelected,
+                textStyle = textStyle,
+                textColor = textColor,
+                selectedTextColor = selectedTextColor,
+                backGroundColor = backGroundColor,
+                selectedItemBackgroundColor = selectedItemBackgroundColor,
+                onClick = {
+                    currentSelectedDate = date
+                    onDateSelected(date)
+                }
+            )
         }
     }
 }
 
 @Composable
-fun DayCard(
-    modifier: Modifier = Modifier,
-    month: String,
-    day: String,
+private fun RailDateItem(
+    date: SimpleDate,
+    isSelected: Boolean,
+    textStyle: TextStyle,
+    textColor: Color,
+    selectedTextColor: Color,
+    backGroundColor: Color,
+    selectedItemBackgroundColor: Color,
+    onClick: () -> Unit,
 ) {
-    Card {
+    LookaheadScope {
         Column(
-            modifier = modifier,
-            horizontalAlignment = Alignment.CenterHorizontally
+            modifier = Modifier
+                .widthIn(min = 48.dp)
+                .clip(if (isSelected) MaterialTheme.shapes.extraLarge else MaterialTheme.shapes.large)
+                .background(
+                    if (isSelected)
+                        selectedItemBackgroundColor
+                    else
+                        backGroundColor
+                )
+                .clickable(onClick = onClick)
+                .animateBounds(
+                    lookaheadScope = this@LookaheadScope
+                )
+                .padding(8.dp),
+            horizontalAlignment = Alignment.CenterHorizontally,
+            verticalArrangement = Arrangement.SpaceBetween
         ) {
-            Text(text = month)
-            Text(text = day)
+            // Day
+            Text(
+                modifier = Modifier.wrapContentSize(unbounded = true),
+                text = date.day.toString().formatToHindiIfLanguageIsFa(),
+                style = textStyle.copy(
+                    platformStyle = PlatformTextStyle(
+                        includeFontPadding = false
+                    ),
+                    fontWeight = FontWeight.Bold
+                ),
+                color = if (isSelected) selectedTextColor else textColor
+            )
+
+            // Month
+            Text(
+                text = date.month.asStringMonthName(),
+                style = textStyle.copy(
+                    platformStyle = PlatformTextStyle(
+                        includeFontPadding = false
+                    ),
+                ),
+                color = if (isSelected) selectedTextColor else textColor
+            )
+
+            // Year
+            Text(
+                text = date.year.toString().formatToHindiIfLanguageIsFa(),
+                style = textStyle.copy(
+                    platformStyle = PlatformTextStyle(
+                        includeFontPadding = false
+                    ),
+                    fontSize = (textStyle.fontSize.value / 3 * 2).sp
+                ),
+                color = if (isSelected) selectedTextColor else textColor
+            )
         }
     }
 }
 
+
+private const val RAIL_CENTER_INDEX = 50_000
+
+private fun dateForIndex(
+    centerDate: SimpleDate,
+    index: Int
+): SimpleDate {
+    val offset = index - RAIL_CENTER_INDEX
+    return centerDate.plusDays(offset)
+}

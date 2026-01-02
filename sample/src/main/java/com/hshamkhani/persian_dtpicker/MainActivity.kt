@@ -39,11 +39,20 @@ class MainActivity : ComponentActivity() {
         super.onCreate(savedInstanceState)
         enableEdgeToEdge()
         setContent {
+            val context = LocalContext.current
+            var selectedDate by remember { mutableStateOf(SimpleDate.now(context)) }
             PersiandtpickerTheme {
                 Scaffold(modifier = Modifier.statusBarsPadding().fillMaxSize()) { innerPadding ->
-                    SamplePersianCalendar(modifier = Modifier.padding(innerPadding))
+//                    SamplePersianCalendar(modifier = Modifier.padding(innerPadding))
 //                    SamplePersianDatePicker()
-//                    RailPicker {  }
+                    RailPicker(
+                        selectedDate = selectedDate
+                    ) { date ->
+                        selectedDate = date
+                    }
+//                    PersianRailDatePicker(
+//                        initialDate = SimpleDate.now(LocalContext.current)
+//                    ) { }
                 }
             }
         }

@@ -186,6 +186,42 @@ fun initMonthDays(monthNumber: Int, year: Int): ImmutableList<Int> {
     return days.toImmutableList()
 }
 
+fun jalaliMonthLength(month: Int, year: Int): Int =
+    when (month) {
+        in 1..6 -> 31
+        in 7..11 -> 30
+        12 -> if (year.isLeap()) 30 else 29
+        else -> 0
+    }
+
+
+fun SimpleDate.plusDays(daysToAdd: Int): SimpleDate {
+    var y = year
+    var m = month
+    var d = day + daysToAdd
+
+    while (d > jalaliMonthLength(m, y)) {
+        d -= jalaliMonthLength(m, y)
+        m++
+        if (m > 12) {
+            m = 1
+            y++
+        }
+    }
+
+    while (d <= 0) {
+        m--
+        if (m < 1) {
+            m = 12
+            y--
+        }
+        d += jalaliMonthLength(m, y)
+    }
+
+    return copy(year = y, month = m, day = d)
+}
+
+
 fun gregorianToJalali(gy: Int, gm: Int, gd: Int): IntArray {
     val g_d_m: IntArray = intArrayOf(0, 31, 59, 90, 120, 151, 181, 212, 243, 273, 304, 334)
     val gy2: Int = if (gm > 2) (gy + 1) else gy
