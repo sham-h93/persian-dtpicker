@@ -127,61 +127,56 @@ private fun RailDateItem(
     selectedItemBackgroundColor: Color,
     onClick: () -> Unit,
 ) {
-    LookaheadScope {
-        Column(
-            modifier = Modifier
-                .widthIn(min = 48.dp)
-                .clip(if (isSelected) MaterialTheme.shapes.extraLarge else MaterialTheme.shapes.large)
-                .background(
-                    if (isSelected)
-                        selectedItemBackgroundColor
-                    else
-                        backGroundColor
-                )
-                .clickable(onClick = onClick)
-                .animateBounds(
-                    lookaheadScope = this@LookaheadScope
-                )
-                .padding(8.dp),
-            horizontalAlignment = Alignment.CenterHorizontally,
-            verticalArrangement = Arrangement.SpaceBetween
-        ) {
-            // Day
-            Text(
-                modifier = Modifier.wrapContentSize(unbounded = true),
-                text = date.day.toString().formatToHindiIfLanguageIsFa(),
-                style = textStyle.copy(
-                    platformStyle = PlatformTextStyle(
-                        includeFontPadding = false
-                    ),
-                    fontWeight = FontWeight.Bold
-                ),
-                color = if (isSelected) selectedTextColor else textColor
+    Column(
+        modifier = Modifier
+            .widthIn(min = 48.dp)
+            .clip(MaterialTheme.shapes.large)
+            .background(
+                if (isSelected)
+                    selectedItemBackgroundColor
+                else
+                    backGroundColor
             )
+            .clickable(onClick = onClick)
+            .padding(8.dp),
+        horizontalAlignment = Alignment.CenterHorizontally,
+        verticalArrangement = Arrangement.SpaceBetween
+    ) {
+        // Day
+        Text(
+            modifier = Modifier.wrapContentSize(unbounded = true),
+            text = date.day.toString().formatToHindiIfLanguageIsFa(),
+            style = textStyle.copy(
+                platformStyle = PlatformTextStyle(
+                    includeFontPadding = false
+                ),
+                fontWeight = FontWeight.Bold
+            ),
+            color = if (isSelected) selectedTextColor else textColor
+        )
 
-            // Month
-            Text(
-                text = date.month.asStringMonthName(),
-                style = textStyle.copy(
-                    platformStyle = PlatformTextStyle(
-                        includeFontPadding = false
-                    ),
+        // Month
+        Text(
+            text = date.month.asStringMonthName(),
+            style = textStyle.copy(
+                platformStyle = PlatformTextStyle(
+                    includeFontPadding = false
                 ),
-                color = if (isSelected) selectedTextColor else textColor
-            )
+            ),
+            color = if (isSelected) selectedTextColor else textColor
+        )
 
-            // Year
-            Text(
-                text = date.year.toString().formatToHindiIfLanguageIsFa(),
-                style = textStyle.copy(
-                    platformStyle = PlatformTextStyle(
-                        includeFontPadding = false
-                    ),
-                    fontSize = (textStyle.fontSize.value / 3 * 2).sp
+        // Year
+        Text(
+            text = date.year.toString().formatToHindiIfLanguageIsFa(),
+            style = textStyle.copy(
+                platformStyle = PlatformTextStyle(
+                    includeFontPadding = false
                 ),
-                color = if (isSelected) selectedTextColor else textColor
-            )
-        }
+                fontSize = (textStyle.fontSize.value / 3 * 2).sp
+            ),
+            color = if (isSelected) selectedTextColor else textColor
+        )
     }
 }
 
