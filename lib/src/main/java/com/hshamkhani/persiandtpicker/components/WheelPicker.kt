@@ -21,6 +21,7 @@ import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableIntStateOf
 import androidx.compose.runtime.remember
+import androidx.compose.runtime.rememberCoroutineScope
 import androidx.compose.runtime.setValue
 import androidx.compose.runtime.snapshotFlow
 import androidx.compose.ui.Alignment
@@ -34,6 +35,7 @@ import androidx.compose.ui.text.font.FontFamily
 import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.unit.Dp
 import androidx.compose.ui.unit.dp
+import kotlinx.coroutines.launch
 
 @Composable
 internal fun WheelPicker(
@@ -49,7 +51,7 @@ internal fun WheelPicker(
     onValueSelected: (index: Int, value: String) -> Unit,
 ) {
 
-
+    val scope = rememberCoroutineScope()
     var selectedIndex by remember { mutableIntStateOf(initialValueIndex) }
     val denisty = LocalDensity.current
     val itemSize = with(denisty) { (textStyle.fontSize * 2).toDp() }
@@ -94,6 +96,7 @@ internal fun WheelPicker(
                                 backGroundColor
                             }
                         )
+                        .clickable { scope.launch { lazyListState.animateScrollToItem(item) } }
                         .padding(itemSize / 10),
                     text = options[item],
                     style = textStyle,
