@@ -73,7 +73,7 @@ internal fun WheelPicker(
     }
 
     Box(
-        modifier = modifier.height((itemSize * 3)),
+        modifier = modifier.height((itemSize * 5)),
     ) {
         LazyColumn(
             modifier = Modifier
@@ -82,6 +82,7 @@ internal fun WheelPicker(
             state = lazyListState,
             verticalArrangement = Arrangement.Center,
         ) {
+            item { FillerItem(modifier = Modifier.height(itemSize)) }
             item { FillerItem(modifier = Modifier.height(itemSize)) }
             items(count = options.size, key = { index -> index }) { item ->
                 Text(
@@ -110,6 +111,7 @@ internal fun WheelPicker(
                 )
             }
             item { FillerItem(modifier = Modifier.height(itemSize)) }
+            item { FillerItem(modifier = Modifier.height(itemSize)) }
         }
         Canvas(
             modifier = Modifier
@@ -119,10 +121,9 @@ internal fun WheelPicker(
         ) {
             drawRect(
                 brush = Brush.verticalGradient(
-                    .1f to backGroundColor,
-                    .3f to Color.Unspecified,
-                    .7f to Color.Unspecified,
-                    .9f to backGroundColor,
+                    0f to backGroundColor,
+                    .5f to Color.Unspecified,
+                    1f to backGroundColor,
                 )
             )
         }
