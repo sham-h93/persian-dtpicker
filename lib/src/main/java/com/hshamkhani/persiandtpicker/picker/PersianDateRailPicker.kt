@@ -1,10 +1,8 @@
 package com.hshamkhani.persiandtpicker.picker
 
-import androidx.compose.animation.animateBounds
 import androidx.compose.foundation.background
 import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.Arrangement
-import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.PaddingValues
 import androidx.compose.foundation.layout.padding
@@ -24,20 +22,21 @@ import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
 import androidx.compose.ui.graphics.Color
-import androidx.compose.ui.layout.LookaheadScope
 import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.text.PlatformTextStyle
+import androidx.compose.ui.text.SpanStyle
 import androidx.compose.ui.text.TextStyle
-import androidx.compose.ui.text.font.FontWeight
+import androidx.compose.ui.text.buildAnnotatedString
+import androidx.compose.ui.text.withStyle
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
-import com.hshamkhani.persiandtpicker.utils.PersianNumberUtils.asStringMonthName
 import com.hshamkhani.persiandtpicker.utils.PersianNumberUtils.formatToHindiIfLanguageIsFa
+import com.hshamkhani.persiandtpicker.utils.PersianNumberUtils.padZeroToStartWithPersianDigits
 import com.hshamkhani.persiandtpicker.utils.SimpleDate
 import com.hshamkhani.persiandtpicker.utils.plusDays
 
 @Composable
-fun RailPicker(
+fun PersianDateRailPicker(
     modifier: Modifier = Modifier,
     textStyle: TextStyle = MaterialTheme.typography.titleLarge,
     textColor: Color = MaterialTheme.colorScheme.onSurface,
@@ -47,7 +46,7 @@ fun RailPicker(
     selectedDate: SimpleDate?,
     onDateSelected: (date: SimpleDate) -> Unit,
 ) {
-    RailPickerImpl(
+    PersianDateRailPickerImpl(
         modifier = modifier,
         textStyle = textStyle,
         textColor = textColor,
@@ -60,7 +59,7 @@ fun RailPicker(
 }
 
 @Composable
-private fun RailPickerImpl(
+private fun PersianDateRailPickerImpl(
     modifier: Modifier = Modifier,
     textStyle: TextStyle = MaterialTheme.typography.headlineMedium,
     textColor: Color = MaterialTheme.colorScheme.onSurface,
@@ -127,9 +126,31 @@ private fun RailDateItem(
     selectedItemBackgroundColor: Color,
     onClick: () -> Unit,
 ) {
+    val topText = buildAnnotatedString {
+        withStyle(
+            style = SpanStyle(
+                fontSize = 14.sp,
+                color = if (isSelected) selectedTextColor else textColor
+            ),
+            block = {
+                append(date.month.padZeroToStartWithPersianDigits().formatToHindiIfLanguageIsFa())
+                append("/")
+            }
+        )
+        withStyle(
+            style = SpanStyle(
+                fontSize = 18.sp,
+                color = if (isSelected) selectedTextColor else textColor
+            ),
+            block = {
+                append(date.day.padZeroToStartWithPersianDigits().formatToHindiIfLanguageIsFa())
+            }
+        )
+    }
+
     Column(
         modifier = Modifier
-            .widthIn(min = 48.dp)
+            .widthIn(min = 56.dp)
             .clip(MaterialTheme.shapes.large)
             .background(
                 if (isSelected)
@@ -145,19 +166,7 @@ private fun RailDateItem(
         // Day
         Text(
             modifier = Modifier.wrapContentSize(unbounded = true),
-            text = date.day.toString().formatToHindiIfLanguageIsFa(),
-            style = textStyle.copy(
-                platformStyle = PlatformTextStyle(
-                    includeFontPadding = false
-                ),
-                fontWeight = FontWeight.Bold
-            ),
-            color = if (isSelected) selectedTextColor else textColor
-        )
-
-        // Month
-        Text(
-            text = date.month.asStringMonthName(),
+            text = topText,
             style = textStyle.copy(
                 platformStyle = PlatformTextStyle(
                     includeFontPadding = false
