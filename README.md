@@ -72,6 +72,44 @@ fun TimePickerExample(
     )
 }
 ```
+
+- `PersianDateRailPicker`:
+
+```css
+@Composable
+fun PersianDateRailPickerExample(
+    modifier: Modifier = Modifier,
+    context: Context
+) {
+    var selectedDate by remember { mutableStateOf(SimpleDate.now(context = context)) }
+
+   PersianDateRailPicker(
+       selectedDate = selectedDate
+   ) { date ->
+       selectedDate = date
+   }
+}
+```
+- `PersianCalendar`:
+
+```css
+@Composable
+fun PersianCalendarExample(
+    modifier: Modifier = Modifier,
+    context: Context
+) {
+    var selectedDate by remember { mutableStateOf(SimpleDate.now(context = context)) }
+
+    PersianCalendar(
+        selectedDate = selectedDate,
+        onDateSelected = { date ->
+            selectedDate = date
+        }
+    )
+}
+```
+
+
 ## More Details
 |*Class*| *Description* |
 |---|---|
@@ -86,7 +124,6 @@ fun TimePickerExample(
 |`SimpleDate.now(context: Context): SimpleDate`|A function that represents current jalali date and time as a `SimpleDate` object.|
 |`SimpleDate.from(timestamp: Long, context: Context): SimpleDate`| A function that converts a timestamp (in milliseconds) to a jalali `SimpleDate` object.|
 |`SimpleTime.now(context: Context): SimpleTime`|A function that returns the current time as a `SimpleTime` object.|
-|||	
 | `fun SimpleDate.toCalendar(): Calendar` | Converts a Gregorian `SimpleDate` to a Calendar object. |
 |`fun SimpleDate.totGregorianDate(): SimpleDate`|Converts a Jalali `SimpleDate` to a Gregorian `SimpleDate`.|
 
