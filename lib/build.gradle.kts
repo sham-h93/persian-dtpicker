@@ -7,7 +7,7 @@ plugins {
 
 val libGroupId = "com.github.sham-h93"
 val libArtifactId = "persian-dtpicker"
-val libVersion = "1.0.0"
+val libVersion = "1.2.3"
 
 android {
     namespace = "com.hshamkhani.persiandtpicker"
