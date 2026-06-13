@@ -133,7 +133,7 @@ private fun RailDateItem(
                 color = if (isSelected) selectedTextColor else textColor
             ),
             block = {
-                append(date.month.padZeroToStartWithPersianDigits().formatToHindiIfLanguageIsFa())
+                append(date.month.padZeroToStartWithPersianDigits())
                 append("/")
             }
         )
@@ -143,7 +143,7 @@ private fun RailDateItem(
                 color = if (isSelected) selectedTextColor else textColor
             ),
             block = {
-                append(date.day.padZeroToStartWithPersianDigits().formatToHindiIfLanguageIsFa())
+                append(date.day.padZeroToStartWithPersianDigits())
             }
         )
     }
