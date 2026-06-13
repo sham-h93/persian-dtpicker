@@ -29,7 +29,10 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
 import androidx.compose.ui.graphics.Brush
 import androidx.compose.ui.graphics.Color
+import androidx.compose.ui.hapticfeedback.HapticFeedback
+import androidx.compose.ui.hapticfeedback.HapticFeedbackType
 import androidx.compose.ui.platform.LocalDensity
+import androidx.compose.ui.platform.LocalHapticFeedback
 import androidx.compose.ui.text.TextStyle
 import androidx.compose.ui.text.font.FontFamily
 import androidx.compose.ui.text.style.TextAlign
@@ -51,6 +54,7 @@ internal fun WheelPicker(
     onValueSelected: (index: Int, value: String) -> Unit,
 ) {
 
+    val haptic = LocalHapticFeedback.current
     val scope = rememberCoroutineScope()
     var selectedIndex by remember { mutableIntStateOf(initialValueIndex) }
     val denisty = LocalDensity.current
@@ -62,6 +66,9 @@ internal fun WheelPicker(
     LaunchedEffect(lazyListState) {
         snapshotFlow { lazyListState.isScrollInProgress }
             .collect { isScrolling ->
+                haptic.performHapticFeedback(
+                    hapticFeedbackType = HapticFeedbackType.Confirm
+                )
                 if (!isScrolling) {
                     val index = lazyListState.firstVisibleItemIndex
                     val middleIndex = index
