@@ -45,6 +45,12 @@ dependencies {
     implementation(libs.kotlinx.collections.immutable)
 }
 
+val sourcesJar by tasks.registering(Jar::class) {
+    description = "registering sourceSets for library"
+    archiveClassifier.set("sources")
+    from(android.sourceSets["main"].java.srcDirs)
+}
+
 publishing {
     publications {
         register<MavenPublication>("release") {
@@ -55,6 +61,7 @@ publishing {
             afterEvaluate {
                 from(components["release"])
             }
+            artifact(sourcesJar)
         }
     }
 }
