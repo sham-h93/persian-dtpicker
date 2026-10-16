@@ -7,7 +7,7 @@ plugins {
 
 val libGroupId = "com.github.sham-h93"
 val libArtifactId = "persian-dtpicker"
-val libVersion = "1.2.0"
+val libVersion = "1.2.1"
 
 android {
     namespace = "com.hshamkhani.persiandtpicker"
@@ -35,6 +35,12 @@ android {
     buildFeatures {
         compose = true
     }
+    publishing {
+        singleVariant("release") {
+            withSourcesJar()
+            withJavadocJar()
+        }
+    }
 }
 
 dependencies {
@@ -43,12 +49,6 @@ dependencies {
     implementation(libs.androidx.ui)
     implementation(libs.kotlinx.datetime)
     implementation(libs.kotlinx.collections.immutable)
-}
-
-val sourcesJar by tasks.registering(Jar::class) {
-    description = "registering sourceSets for library"
-    archiveClassifier.set("sources")
-    from(android.sourceSets["main"].java.srcDirs)
 }
 
 publishing {
@@ -61,7 +61,6 @@ publishing {
             afterEvaluate {
                 from(components["release"])
             }
-            artifact(sourcesJar)
         }
     }
 }
