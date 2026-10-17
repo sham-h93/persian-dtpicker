@@ -126,6 +126,7 @@ class MainActivity : ComponentActivity() {
                             ) {
                                 PersianDatePicker(
                                     withTimePicker = true,
+                                    initialDate = selectedDate,
                                     onDateSelected = { date ->
                                         selectedDate = date
                                     },

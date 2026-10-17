@@ -18,7 +18,6 @@ import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.platform.LocalLayoutDirection
 import androidx.compose.ui.text.TextStyle
 import androidx.compose.ui.text.font.FontFamily
-import androidx.compose.ui.text.intl.Locale
 import androidx.compose.ui.unit.LayoutDirection
 import androidx.compose.ui.unit.dp
 import com.hshamkhani.persiandtpicker.components.WheelPicker
@@ -48,6 +47,7 @@ import com.hshamkhani.persiandtpicker.utils.initYearList
 fun PersianDatePicker(
     modifier: Modifier = Modifier,
     withTimePicker: Boolean = false,
+    initialDate: SimpleDate = SimpleDate.now(context = LocalContext.current),
     textStyle: TextStyle = MaterialTheme.typography.headlineMedium,
     fontFamily: FontFamily = FontFamily.Default,
     textColor: Color = MaterialTheme.colorScheme.onSurface,
@@ -56,11 +56,8 @@ fun PersianDatePicker(
     selectedItemBackgroundColor: Color = MaterialTheme.colorScheme.surfaceContainerLowest,
     onDateSelected: (date: SimpleDate) -> Unit,
 ) {
-
-    val context = LocalContext.current
-
-    val initialDate by remember { mutableStateOf(SimpleDate.now(context = context)) }
-    var simpleDate by remember { mutableStateOf(initialDate) }
+    val _initialDate by remember { mutableStateOf(initialDate) }
+    var simpleDate by remember { mutableStateOf(_initialDate) }
 
     LaunchedEffect(simpleDate) {
         onDateSelected(simpleDate)
@@ -68,7 +65,7 @@ fun PersianDatePicker(
 
     val years by remember {
         mutableStateOf(
-            initYearList(initialDate.year)
+            initYearList(_initialDate.year)
                 .map { it.toString().formatToHindiIfLanguageIsFa() })
     }
 
@@ -93,6 +90,7 @@ fun PersianDatePicker(
         ) {
             WheelPicker(
                 options = years,
+                initialValueIndex = years.size / 2,
                 fontFamily = fontFamily,
                 textStyle = textStyle,
                 textColor = textColor,
@@ -108,7 +106,7 @@ fun PersianDatePicker(
 
             WheelPicker(
                 options = months,
-                initialValueIndex = initialDate.month - 1,
+                initialValueIndex = _initialDate.month - 1,
                 fontFamily = fontFamily,
                 textStyle = textStyle,
                 textColor = textColor,
@@ -125,7 +123,7 @@ fun PersianDatePicker(
             WheelPicker(
                 modifier = Modifier,
                 options = days,
-                initialValueIndex = initialDate.day - 1,
+                initialValueIndex = _initialDate.day - 1,
                 fontFamily = fontFamily,
                 textStyle = textStyle,
                 textColor = textColor,
@@ -156,7 +154,6 @@ fun PersianDatePicker(
                 }
                 Spacer(Modifier.width(8.dp))
             }
-
         }
     }
 }

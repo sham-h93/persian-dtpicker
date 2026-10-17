@@ -103,7 +103,7 @@ fun initDaysList(monthLength: Int): List<String> {
  */
 fun initYearList(shYear: Int): List<Int> {
     val values = mutableListOf<Int>()
-    (shYear until shYear + 20).map { year ->
+    (shYear - 120 until shYear + 120).map { year ->
         values.add(year)
     }
     return values
@@ -150,16 +150,12 @@ fun initAmPm(isEng: Boolean): Pair<String, String> {
 }
 
 private val leapYears = listOf(
-    1403,
-    1407,
-    1411,
-    1415,
-    1419,
-    1423,
-    1427,
-    1431,
-    1435,
-    1439
+    1304, 1308, 1312, 1316, 1320, 1324,
+    1329, 1333, 1337, 1341, 1345, 1349,
+    1354, 1358, 1362, 1366, 1370, 1375,
+    1379, 1383, 1387, 1391, 1395, 1399,
+    1403, 1407, 1411, 1415, 1419, 1423,
+    1427, 1431, 1435, 1439
 )
 
 /**
