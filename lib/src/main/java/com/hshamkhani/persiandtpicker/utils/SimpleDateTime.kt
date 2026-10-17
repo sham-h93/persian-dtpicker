@@ -2,7 +2,6 @@ package com.hshamkhani.persiandtpicker.utils
 
 import android.content.Context
 import android.text.format.DateFormat
-import com.hshamkhani.persiandtpicker.utils.gregorianToJalali
 import java.time.Instant
 import java.time.LocalDateTime
 import java.time.LocalTime
@@ -32,20 +31,11 @@ data class SimpleDate(
          * */
         fun now(context: Context): SimpleDate {
             val date = currentJalaliDate()
-            val dateTime = LocalDateTime.now(ZoneId.systemDefault())
-            val is24Hour = DateFormat.is24HourFormat(context)
-
             return SimpleDate(
                 year = date.component1(),
                 month = date.component2(),
                 day = date.component3(),
-                time = SimpleTime(
-                    hour = dateTime.hour,
-                    minute = dateTime.minute,
-                    clockPeriod = if (is24Hour) null else {
-                        if (dateTime.hour < 12) ClockPeriod.Am else ClockPeriod.Pm
-                    }
-                ),
+                time = SimpleTime.now(context),
             )
 
         }
@@ -69,19 +59,14 @@ data class SimpleDate(
                 gd = localDateTime.dayOfMonth
             )
 
-            val dateTime = LocalDateTime.now(ZoneId.systemDefault())
-            val is24Hour = DateFormat.is24HourFormat(context)
-
             return SimpleDate(
                 year = jalaliDt.component1(),
                 month = jalaliDt.component2(),
                 day = jalaliDt.component3(),
-                time = SimpleTime(
-                    hour = dateTime.hour,
-                    minute = dateTime.minute,
-                    clockPeriod = if (is24Hour) null else {
-                        if (dateTime.hour < 12) ClockPeriod.Am else ClockPeriod.Pm
-                    }
+                time = SimpleTime.of(
+                    hourOfDay = localDateTime.hour,
+                    minute = localDateTime.minute,
+                    is24Hour = DateFormat.is24HourFormat(context),
                 )
             )
         }
@@ -113,16 +98,34 @@ data class SimpleTime(
          * */
         fun now(context: Context): SimpleTime {
             val time = LocalTime.now(ZoneId.systemDefault())
-            val is24Hour = DateFormat.is24HourFormat(context)
-
-            return SimpleTime(
-                hour = time.hour,
+            return of(
+                hourOfDay = time.hour,
                 minute = time.minute,
-                clockPeriod = if (is24Hour) null else {
-                    if (time.hour < 12) ClockPeriod.Am else ClockPeriod.Pm
-                }
+                is24Hour = DateFormat.is24HourFormat(context),
             )
         }
+
+        /**
+         * Creates a `SimpleTime` from a 24-hour [hourOfDay] (0-23), in 12-hour form
+         * (hour 1-12 plus a `ClockPeriod`) unless [is24Hour] is true.
+         * */
+        fun of(hourOfDay: Int, minute: Int, is24Hour: Boolean): SimpleTime {
+            if (is24Hour) return SimpleTime(hour = hourOfDay, minute = minute)
+            return SimpleTime(
+                hour = (hourOfDay % 12).let { if (it == 0) 12 else it },
+                minute = minute,
+                clockPeriod = if (hourOfDay < 12) ClockPeriod.Am else ClockPeriod.Pm,
+            )
+        }
+    }
+
+    /**
+     * The hour in 24-hour form (0-23), whichever format this time is in.
+     * */
+    fun hourOfDay(): Int = when (clockPeriod) {
+        null -> hour
+        ClockPeriod.Am -> hour % 12
+        ClockPeriod.Pm -> hour % 12 + 12
     }
 }
 
@@ -163,16 +166,10 @@ fun SimpleDate.toCalendar(): Calendar {
         set(Calendar.YEAR, year)
         set(Calendar.MONTH, month - 1) // Calendar months are 0-based
         set(Calendar.DAY_OF_MONTH, day)
+        set(Calendar.HOUR_OF_DAY, this@toCalendar.time.hourOfDay())
         set(Calendar.MINUTE, this@toCalendar.time.minute)
-        if (this@toCalendar.time.clockPeriod != null) {
-            set(
-                Calendar.AM_PM,
-                if (this@toCalendar.time.clockPeriod == ClockPeriod.Am) Calendar.AM else Calendar.PM
-            )
-            set(Calendar.HOUR, this@toCalendar.time.hour)
-        } else {
-            set(Calendar.HOUR_OF_DAY, this@toCalendar.time.hour)
-        }
+        set(Calendar.SECOND, 0)
+        set(Calendar.MILLISECOND, 0)
     }
     return calendar
 }

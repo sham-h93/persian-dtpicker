@@ -11,29 +11,29 @@ A simple, minimal, and fully customizable Persian Date Picker for Jetpack Compos
 >
 **Step 1**  Add JitPack to your **root** `build.gradle.kts` or `settings.gradle`:
 
-
-	dependencyResolutionManagement {
-		repositoriesMode.set(RepositoriesMode.FAIL_ON_PROJECT_REPOS)
-		repositories {
-			maven { url = uri("https://jitpack.io") }
-		}
-	}
+```kotlin
+dependencyResolutionManagement {
+    repositories {
+        maven { url = uri("https://jitpack.io") }
+    }
+}
+```
 
 **Step 2**  Add the dependency to the module `build.gradle.kts`
 
-```css
+```kotlin
 dependencies {
-	implementation("com.github.sham-h93:persian-dtpicker:<latest-version>")
+    implementation("com.github.sham-h93:persian-dtpicker:<latest-version>")
 }
 ```
 ---
 ### Usage
 
 Minimal usage of `PersianDatePicker` with a time picker:
->You can also use it without time picker by setting property  `withTimePicker` to ` false`.
+> Set `withTimePicker = false` to show the date wheels only. `initialDate` is only read on first composition.
 
 
-```css
+```kotlin
 @Composable
 fun PersianDtPickerExample(
     modifier: Modifier = Modifier,
@@ -44,6 +44,7 @@ fun PersianDtPickerExample(
     PersianDatePicker(
         modifier = modifier,
         withTimePicker = true,
+        initialDate = selectedDate,
         onDateSelected = { date: SimpleDate ->
             selectedDate = date
         },
@@ -56,18 +57,19 @@ fun PersianDtPickerExample(
 Additionally, you can use the `TimePicker` independently:
 
 
-```css
+```kotlin
 @Composable
 fun TimePickerExample(
     modifier: Modifier = Modifier,
     context: Context
 ) {
-    var selectedDate by remember { mutableStateOf(SimpleTime.now(context = context)) }
+    var selectedTime by remember { mutableStateOf(SimpleTime.now(context = context)) }
 
     TimePicker(
         modifier = modifier,
+        initialTime = selectedTime,
         onTimeChanged = { time: SimpleTime ->
-            selectedDate = time
+            selectedTime = time
         },
     )
 }
@@ -75,7 +77,7 @@ fun TimePickerExample(
 
 - `PersianDateRailPicker`:
 
-```css
+```kotlin
 @Composable
 fun PersianDateRailPickerExample(
     modifier: Modifier = Modifier,
@@ -92,7 +94,7 @@ fun PersianDateRailPickerExample(
 ```
 - `PersianCalendar`:
 
-```css
+```kotlin
 @Composable
 fun PersianCalendarExample(
     modifier: Modifier = Modifier,
@@ -114,7 +116,7 @@ fun PersianCalendarExample(
 |*Class*| *Description* |
 |---|---|
 |`data class SimpleDate`|Represents a simple date (either gregorian or jalali) with year, month, day, and an optional `SimpleTime` object.|
-|`data class SimpleTime`|Represents a time with hour, minute, and an `ClockPeriod` (`Am`/`Pm`), if the clock in 12-hour time format.|
+|`data class SimpleTime`|A time with hour and minute. In 12-hour format `hour` is 1-12 and `clockPeriod` is set; in 24-hour format `hour` is 0-23 and `clockPeriod` is `null`. Pickers follow the device setting.|
 |`enum class ClockPeriod`|Clock period (`Am`, `Pm`) for a clock in 12-hour time format.|
 
 ---
@@ -124,6 +126,8 @@ fun PersianCalendarExample(
 |`SimpleDate.now(context: Context): SimpleDate`|A function that represents current jalali date and time as a `SimpleDate` object.|
 |`SimpleDate.from(timestamp: Long, context: Context): SimpleDate`| A function that converts a timestamp (in milliseconds) to a jalali `SimpleDate` object.|
 |`SimpleTime.now(context: Context): SimpleTime`|A function that returns the current time as a `SimpleTime` object.|
+|`SimpleTime.of(hourOfDay: Int, minute: Int, is24Hour: Boolean): SimpleTime`|Creates a `SimpleTime` from a 0-23 hour, in 12- or 24-hour form.|
+|`fun SimpleTime.hourOfDay(): Int`|The hour as 0-23, whichever format the time is in.|
 | `fun SimpleDate.toCalendar(): Calendar` | Converts a Gregorian `SimpleDate` to a Calendar object. |
 |`fun SimpleDate.totGregorianDate(): SimpleDate`|Converts a Jalali `SimpleDate` to a Gregorian `SimpleDate`.|
 

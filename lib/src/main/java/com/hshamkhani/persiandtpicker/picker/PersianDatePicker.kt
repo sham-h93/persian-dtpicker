@@ -24,7 +24,7 @@ import com.hshamkhani.persiandtpicker.components.WheelPicker
 import com.hshamkhani.persiandtpicker.utils.PersianNumberUtils.formatToHindiIfLanguageIsFa
 import com.hshamkhani.persiandtpicker.utils.SimpleDate
 import com.hshamkhani.persiandtpicker.utils.initDaysList
-import com.hshamkhani.persiandtpicker.utils.initMonthDays
+import com.hshamkhani.persiandtpicker.utils.jalaliMonthLength
 import com.hshamkhani.persiandtpicker.utils.initMonthList
 import com.hshamkhani.persiandtpicker.utils.initYearList
 
@@ -33,6 +33,8 @@ import com.hshamkhani.persiandtpicker.utils.initYearList
  * for selecting the day, month, and year.
  *
  * @param modifier The modifier to be applied to the time picker.
+ * @param withTimePicker Whether to show hour/minute wheels next to the date.
+ * @param initialDate The jalali date (and time) shown when the picker first appears.
  * @param textStyle The text style for the time picker options.
  * @param textColor The color of the text for the time picker options.
  * @param selectedTextColor The color of the text for the selected time picker option.
@@ -63,25 +65,15 @@ fun PersianDatePicker(
         onDateSelected(simpleDate)
     }
 
-    val years by remember {
-        mutableStateOf(
-            initYearList(_initialDate.year)
-                .map { it.toString().formatToHindiIfLanguageIsFa() })
+    val years = remember { initYearList(_initialDate.year) }
+    val yearLabels = remember { years.map { it.toString().formatToHindiIfLanguageIsFa() } }
+    val months = remember { initMonthList() }
+    val days = remember(simpleDate.year, simpleDate.month) {
+        initDaysList(jalaliMonthLength(simpleDate.month, simpleDate.year))
     }
 
-    val months by remember {
-        mutableStateOf(
-            initMonthList()
-        )
-    }
-
-    val days by remember(simpleDate.month) {
-        val monthLength =
-            initMonthDays(simpleDate.month, simpleDate.year).size
-        mutableStateOf(
-            initDaysList(monthLength).map { it }
-        )
-    }
+    // Keep the day valid when the month or year changes (e.g. 31 Shahrivar -> 30 Mehr).
+    fun SimpleDate.withValidDay() = copy(day = day.coerceAtMost(jalaliMonthLength(month, year)))
 
     CompositionLocalProvider(LocalLayoutDirection provides LayoutDirection.Ltr) {
         Row(
@@ -89,18 +81,16 @@ fun PersianDatePicker(
             horizontalArrangement = Arrangement.spacedBy(4.dp)
         ) {
             WheelPicker(
-                options = years,
-                initialValueIndex = years.size / 2,
+                options = yearLabels,
+                initialValueIndex = years.indexOf(_initialDate.year),
                 fontFamily = fontFamily,
                 textStyle = textStyle,
                 textColor = textColor,
                 selectedTextColor = selectedTextColor,
                 backGroundColor = backGroundColor,
                 selectedItemBackgroundColor = selectedItemBackgroundColor,
-                onValueSelected = { index, value ->
-                    simpleDate = simpleDate.copy(
-                        year = value.toInt()
-                    )
+                onValueSelected = { index, _ ->
+                    simpleDate = simpleDate.copy(year = years[index]).withValidDay()
                 }
             )
 
@@ -114,9 +104,7 @@ fun PersianDatePicker(
                 backGroundColor = backGroundColor,
                 selectedItemBackgroundColor = selectedItemBackgroundColor,
                 onValueSelected = { index, _ ->
-                    simpleDate = simpleDate.copy(
-                        month = index + 1 // month is 1-based,
-                    )
+                    simpleDate = simpleDate.copy(month = index + 1).withValidDay() // month is 1-based
                 }
             )
 
@@ -130,17 +118,15 @@ fun PersianDatePicker(
                 selectedTextColor = selectedTextColor,
                 backGroundColor = backGroundColor,
                 selectedItemBackgroundColor = selectedItemBackgroundColor,
-                onValueSelected = { index, value ->
-                    simpleDate = simpleDate.copy(
-                        day = value.toInt(),
-                    )
+                onValueSelected = { index, _ ->
+                    simpleDate = simpleDate.copy(day = index + 1)
                 }
             )
-
 
             if (withTimePicker) {
                 TimePicker(
                     modifier = Modifier,
+                    initialTime = _initialDate.time,
                     textStyle = textStyle,
                     fontFamily = fontFamily,
                     textColor = textColor,

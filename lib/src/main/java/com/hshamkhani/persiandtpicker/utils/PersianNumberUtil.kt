@@ -72,7 +72,7 @@ internal object PersianNumberUtils {
             7 -> if (isFa) "مهر" else "Mehr"
             8 -> if (isFa) "آبان" else "Aban"
             9 -> if (isFa) "آذر" else "Azar"
-            10 -> if (isFa) "دی" else "Day"
+            10 -> if (isFa) "دی" else "Dey"
             11 -> if (isFa) "بهمن" else "Bahman"
             12 -> if (isFa) "اسفند" else "Esfand"
             else -> throw IllegalArgumentException()

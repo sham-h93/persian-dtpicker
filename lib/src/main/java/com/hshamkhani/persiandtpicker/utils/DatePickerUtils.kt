@@ -21,12 +21,12 @@ private val englishWeekDays = listOf(
 )
 
 private val persianWeekDays = listOf(
-    "شنیه",
+    "شنبه",
     "یک\u200Cشنبه",
     "دوشنبه",
     "سه\u200Cشنبه",
     "چهارشنبه",
-    "پتج\u200Cشنبه",
+    "پنج\u200Cشنبه",
     "جمعه",
 )
 
@@ -55,7 +55,7 @@ private val englishMonthNames = listOf(
     "Mehr",
     "Aban",
     "Azar",
-    "Day",
+    "Dey",
     "Bahman",
     "Esfand"
 )
@@ -149,19 +149,14 @@ fun initAmPm(isEng: Boolean): Pair<String, String> {
     return if (isEng) "AM" to "PM" else "ق.ظ" to "ب.ظ"
 }
 
-private val leapYears = listOf(
-    1304, 1308, 1312, 1316, 1320, 1324,
-    1329, 1333, 1337, 1341, 1345, 1349,
-    1354, 1358, 1362, 1366, 1370, 1375,
-    1379, 1383, 1387, 1391, 1395, 1399,
-    1403, 1407, 1411, 1415, 1419, 1423,
-    1427, 1431, 1435, 1439
-)
-
 /**
- * Returns true if the given jalali year is a leap year.
+ * Returns true if the given jalali year is a leap year (its Esfand has 30 days).
  * */
-fun Int.isLeap(): Boolean = this in leapYears
+fun Int.isLeap(): Boolean {
+    val (gy, gm, gd) = jalaliToGregorian(jy = this, jm = 12, jd = 30)
+    val (jy, jm, jd) = gregorianToJalali(gy = gy, gm = gm, gd = gd)
+    return jy == this && jm == 12 && jd == 30
+}
 
 /**
  * Returns a list of integers representing the days in a month

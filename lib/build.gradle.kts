@@ -49,6 +49,8 @@ dependencies {
     implementation(libs.androidx.ui)
     implementation(libs.kotlinx.datetime)
     implementation(libs.kotlinx.collections.immutable)
+
+    testImplementation(libs.junit)
 }
 
 publishing {
