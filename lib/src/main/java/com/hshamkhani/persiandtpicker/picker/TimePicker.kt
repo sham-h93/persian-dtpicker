@@ -55,7 +55,7 @@ fun TimePicker(
     textColor: Color = MaterialTheme.colorScheme.onSurface,
     selectedTextColor: Color = MaterialTheme.colorScheme.primary,
     backGroundColor: Color = MaterialTheme.colorScheme.background,
-    selectedItemBackgroundColor: Color = MaterialTheme.colorScheme.surfaceContainerLowest,
+    selectedItemBackgroundColor: Color = MaterialTheme.colorScheme.surfaceContainerHigh,
     fontFamily: FontFamily = FontFamily.Default,
     onTimeChanged: (SimpleTime) -> Unit,
 ) {

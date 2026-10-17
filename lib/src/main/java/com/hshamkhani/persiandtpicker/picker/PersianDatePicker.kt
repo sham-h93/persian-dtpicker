@@ -53,7 +53,7 @@ fun PersianDatePicker(
     textColor: Color = MaterialTheme.colorScheme.onSurface,
     selectedTextColor: Color = MaterialTheme.colorScheme.primary,
     backGroundColor: Color = MaterialTheme.colorScheme.background,
-    selectedItemBackgroundColor: Color = MaterialTheme.colorScheme.surfaceContainerLowest,
+    selectedItemBackgroundColor: Color = MaterialTheme.colorScheme.surfaceContainerHigh,
     onDateSelected: (date: SimpleDate) -> Unit,
 ) {
     val _initialDate by remember { mutableStateOf(initialDate) }
