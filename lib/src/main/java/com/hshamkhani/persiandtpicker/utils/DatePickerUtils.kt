@@ -30,6 +30,18 @@ private val persianWeekDays = listOf(
     "جمعه",
 )
 
+private val englishShortWeekDays = listOf("Sat", "Sun", "Mon", "Tue", "Wed", "Thu", "Fri")
+
+private val persianShortWeekDays = listOf(
+    "شنبه",
+    "۱شنبه",
+    "۲شنبه",
+    "۳شنبه",
+    "۴شنبه",
+    "۵شنبه",
+    "جمعه",
+)
+
 private val farsiMonthNames = listOf(
     "فروردین",
     "اردیبهشت",
@@ -61,6 +73,9 @@ private val englishMonthNames = listOf(
 )
 
 fun weekDays() = if (Locale.getDefault().language == "fa") persianWeekDays else englishWeekDays
+
+fun shortWeekDays() =
+    if (Locale.getDefault().language == "fa") persianShortWeekDays else englishShortWeekDays
 
 fun SimpleDate.dayOfWeek(): Int {
     val calendar = totGregorianDate().toCalendar()

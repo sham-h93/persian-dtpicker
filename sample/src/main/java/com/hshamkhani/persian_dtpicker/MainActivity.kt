@@ -134,7 +134,7 @@ class MainActivity : ComponentActivity() {
                                     textColor = MaterialTheme.colorScheme.onBackground,
                                     selectedTextColor = MaterialTheme.colorScheme.onBackground,
                                     backGroundColor = MaterialTheme.colorScheme.background,
-                                    selectedItemBackgroundColor = MaterialTheme.colorScheme.surfaceContainerHighest,
+                                    selectedItemBackgroundColor = MaterialTheme.colorScheme.primaryContainer,
                                 )
                             }
                         }
@@ -145,6 +145,7 @@ class MainActivity : ComponentActivity() {
                                 contentAlignment = Alignment.Center
                             ) {
                                 PersianDateRailPicker(
+                                    stickyMonthHeader = true,
                                     selectedDate = selectedDate
                                 ) { date ->
                                     selectedDate = date
