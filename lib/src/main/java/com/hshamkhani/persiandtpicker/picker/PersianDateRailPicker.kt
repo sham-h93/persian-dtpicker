@@ -25,6 +25,7 @@ import androidx.compose.foundation.layout.wrapContentSize
 import androidx.compose.foundation.lazy.LazyListState
 import androidx.compose.foundation.lazy.LazyRow
 import androidx.compose.foundation.lazy.rememberLazyListState
+import androidx.compose.foundation.shape.CircleShape
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Text
@@ -64,6 +65,8 @@ import com.hshamkhani.persiandtpicker.utils.shortWeekDays
  * start of the rail, showing the month (and year, if not the current one) of the first visible
  * day. Days scrolling underneath fade out into [fadeColor].
  * @param fadeColor background behind the sticky label; should match the rail's container color.
+ * @param isMarked days for which a small dot is drawn under the day number, e.g. days with events.
+ * @param markerColor color of that dot; [selectedMarkerColor] is used on the selected day.
  */
 @Composable
 fun PersianDateRailPicker(
@@ -80,6 +83,9 @@ fun PersianDateRailPicker(
     selectedItemBackgroundColor: Color = MaterialTheme.colorScheme.primaryContainer,
     stickyMonthHeader: Boolean = false,
     fadeColor: Color = MaterialTheme.colorScheme.surface,
+    isMarked: (date: SimpleDate) -> Boolean = { false },
+    markerColor: Color = MaterialTheme.colorScheme.primary,
+    selectedMarkerColor: Color = selectedTextColor,
     selectedDate: SimpleDate?,
     onDateSelected: (date: SimpleDate) -> Unit,
 ) {
@@ -126,6 +132,9 @@ fun PersianDateRailPicker(
                     monthLabelColor = monthLabelColor,
                     backGroundColor = backGroundColor,
                     selectedItemBackgroundColor = selectedItemBackgroundColor,
+                    isMarked = isMarked(date),
+                    markerColor = markerColor,
+                    selectedMarkerColor = selectedMarkerColor,
                     onClick = {
                         currentSelectedDate = date
                         onDateSelected(date)
@@ -230,6 +239,9 @@ private fun RailDateItem(
     monthLabelColor: Color,
     backGroundColor: Color,
     selectedItemBackgroundColor: Color,
+    isMarked: Boolean,
+    markerColor: Color,
+    selectedMarkerColor: Color,
     onClick: () -> Unit,
 ) {
     val noFontPadding = PlatformTextStyle(includeFontPadding = false)
@@ -319,6 +331,15 @@ private fun RailDateItem(
                 },
                 textAlign = TextAlign.Center,
             )
+            // Sits in the box's bottom padding, under the number, so marked days keep the same size.
+            if (isMarked) Box(
+                modifier = Modifier
+                    .align(Alignment.BottomCenter)
+                    .padding(bottom = MARKER_BOTTOM_PADDING)
+                    .size(MARKER_SIZE)
+                    .clip(CircleShape)
+                    .background(if (isSelected) selectedMarkerColor else markerColor)
+            )
         }
     }
 }
@@ -340,6 +361,8 @@ private val ITEM_WIDTH = 48.dp
 private val ITEM_SPACING = 4.dp
 private val DAY_BOX_SIZE = 40.dp
 private val WEEK_DAY_HEIGHT = 20.dp
+private val MARKER_SIZE = 4.dp
+private val MARKER_BOTTOM_PADDING = 4.dp
 
 private const val RAIL_CENTER_INDEX = 50_000
 

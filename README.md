@@ -92,6 +92,16 @@ fun PersianDateRailPickerExample(
    }
 }
 ```
+
+To put a dot under days that have something on them, pass `isMarked`:
+
+```kotlin
+PersianDateRailPicker(
+    selectedDate = selectedDate,
+    isMarked = { date -> date in daysWithEvents },
+    onDateSelected = { selectedDate = it },
+)
+```
 - `PersianCalendar`:
 
 ```kotlin
