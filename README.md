@@ -93,6 +93,9 @@ fun PersianDateRailPickerExample(
 }
 ```
 
+To give today a background like the selected day's, pass `todayBackgroundColor`
+(e.g. `MaterialTheme.colorScheme.secondaryContainer`).
+
 To put a dot under days that have something on them, pass `isMarked`:
 
 ```kotlin

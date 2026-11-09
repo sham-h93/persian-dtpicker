@@ -65,6 +65,8 @@ import com.hshamkhani.persiandtpicker.utils.shortWeekDays
  * start of the rail, showing the month (and year, if not the current one) of the first visible
  * day. Days scrolling underneath fade out into [fadeColor].
  * @param fadeColor background behind the sticky label; should match the rail's container color.
+ * @param todayBackgroundColor background behind today's number, drawn like the selected day's
+ * background; the selected background wins when today is selected. Defaults to [backGroundColor].
  * @param isMarked days for which a small dot is drawn under the day number, e.g. days with events.
  * @param markerColor color of that dot; [selectedMarkerColor] is used on the selected day.
  */
@@ -81,6 +83,7 @@ fun PersianDateRailPicker(
     monthLabelColor: Color = MaterialTheme.colorScheme.primary,
     backGroundColor: Color = Color.Transparent,
     selectedItemBackgroundColor: Color = MaterialTheme.colorScheme.primaryContainer,
+    todayBackgroundColor: Color = backGroundColor,
     stickyMonthHeader: Boolean = false,
     fadeColor: Color = MaterialTheme.colorScheme.surface,
     isMarked: (date: SimpleDate) -> Boolean = { false },
@@ -132,6 +135,7 @@ fun PersianDateRailPicker(
                     monthLabelColor = monthLabelColor,
                     backGroundColor = backGroundColor,
                     selectedItemBackgroundColor = selectedItemBackgroundColor,
+                    todayBackgroundColor = todayBackgroundColor,
                     isMarked = isMarked(date),
                     markerColor = markerColor,
                     selectedMarkerColor = selectedMarkerColor,
@@ -239,6 +243,7 @@ private fun RailDateItem(
     monthLabelColor: Color,
     backGroundColor: Color,
     selectedItemBackgroundColor: Color,
+    todayBackgroundColor: Color,
     isMarked: Boolean,
     markerColor: Color,
     selectedMarkerColor: Color,
@@ -315,7 +320,13 @@ private fun RailDateItem(
             modifier = Modifier
                 .size(DAY_BOX_SIZE)
                 .clip(RoundedCornerShape(12.dp))
-                .background(if (isSelected) selectedItemBackgroundColor else backGroundColor),
+                .background(
+                    when {
+                        isSelected -> selectedItemBackgroundColor
+                        isToday -> todayBackgroundColor
+                        else -> backGroundColor
+                    }
+                ),
             contentAlignment = Alignment.Center
         ) {
             Text(
